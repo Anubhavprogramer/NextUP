@@ -30,10 +30,14 @@ jest.mock('@react-navigation/native', () => {
 // Mock vector icons
 jest.mock('react-native-vector-icons/Ionicons', () => 'Icon');
 
-// Mock UUID
-jest.mock('uuid', () => ({
-  v4: () => 'test-uuid-' + Math.random().toString(36).substr(2, 9),
-}));
+// Mock our custom UUID generator for consistent test results
+jest.mock('../Utils/helpers', () => {
+  const actual = jest.requireActual('../Utils/helpers');
+  return {
+    ...actual,
+    generateId: () => 'test-uuid-' + Math.random().toString(36).substr(2, 9),
+  };
+});
 
 // Global test configuration
 global.__DEV__ = true;

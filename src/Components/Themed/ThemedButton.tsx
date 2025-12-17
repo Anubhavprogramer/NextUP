@@ -36,26 +36,22 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
       baseStyle.push(styles.fullWidth);
     }
 
+    const variantStyle: any = {};
     switch (variant) {
       case 'primary':
-        baseStyle.push({
-          backgroundColor: disabled ? theme.colors.textTertiary : theme.colors.primary,
-        });
+        variantStyle.backgroundColor = disabled ? theme.colors.textTertiary : theme.colors.primary;
         break;
       case 'secondary':
-        baseStyle.push({
-          backgroundColor: disabled ? theme.colors.textTertiary : theme.colors.secondary,
-        });
+        variantStyle.backgroundColor = disabled ? theme.colors.textTertiary : theme.colors.secondary;
         break;
       case 'outline':
-        baseStyle.push({
-          backgroundColor: 'transparent',
-          borderWidth: 1,
-          borderColor: disabled ? theme.colors.textTertiary : theme.colors.primary,
-        });
+        variantStyle.backgroundColor = 'transparent';
+        variantStyle.borderWidth = 1;
+        variantStyle.borderColor = disabled ? theme.colors.textTertiary : theme.colors.primary;
         break;
     }
 
+    baseStyle.push(variantStyle);
     return baseStyle;
   };
 

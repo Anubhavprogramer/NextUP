@@ -167,41 +167,41 @@ export const GenreSelector: React.FC<GenreSelectorProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: DESIGN_CONSTANTS.SPACING.MD,
+    marginBottom: DESIGN_CONSTANTS.SPACING.medium,
   },
   label: {
-    marginBottom: DESIGN_CONSTANTS.SPACING.XS,
-    fontWeight: DESIGN_CONSTANTS.FONT_WEIGHTS.MEDIUM,
+    marginBottom: DESIGN_CONSTANTS.SPACING.xsmall,
+    fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.medium,
   },
   helperText: {
-    marginBottom: DESIGN_CONSTANTS.SPACING.MD,
+    marginBottom: DESIGN_CONSTANTS.SPACING.medium,
     opacity: 0.7,
   },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: DESIGN_CONSTANTS.SPACING.LG,
+    paddingVertical: DESIGN_CONSTANTS.SPACING.large,
   },
   loadingText: {
-    marginLeft: DESIGN_CONSTANTS.SPACING.SM,
+    marginLeft: DESIGN_CONSTANTS.SPACING.small,
   },
   errorContainer: {
     alignItems: 'center',
-    paddingVertical: DESIGN_CONSTANTS.SPACING.LG,
+    paddingVertical: DESIGN_CONSTANTS.SPACING.large,
   },
   errorText: {
     textAlign: 'center',
-    marginBottom: DESIGN_CONSTANTS.SPACING.SM,
+    marginBottom: DESIGN_CONSTANTS.SPACING.small,
   },
   retryButton: {
     borderWidth: 1,
-    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.MD,
-    paddingHorizontal: DESIGN_CONSTANTS.SPACING.MD,
-    paddingVertical: DESIGN_CONSTANTS.SPACING.SM,
+    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
+    paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
+    paddingVertical: DESIGN_CONSTANTS.SPACING.small,
   },
   retryText: {
-    fontWeight: DESIGN_CONSTANTS.FONT_WEIGHTS.MEDIUM,
+    fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.medium,
   },
   genresContainer: {
     maxHeight: 200,
@@ -209,20 +209,20 @@ const styles = StyleSheet.create({
   genresGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: DESIGN_CONSTANTS.SPACING.SM,
+    gap: DESIGN_CONSTANTS.SPACING.small,
   },
   genreChip: {
     borderWidth: 1,
-    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.ROUND,
-    paddingHorizontal: DESIGN_CONSTANTS.SPACING.MD,
-    paddingVertical: DESIGN_CONSTANTS.SPACING.SM,
-    marginBottom: DESIGN_CONSTANTS.SPACING.SM,
+    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.round,
+    paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
+    paddingVertical: DESIGN_CONSTANTS.SPACING.small,
+    marginBottom: DESIGN_CONSTANTS.SPACING.small,
   },
   genreText: {
-    fontSize: DESIGN_CONSTANTS.FONT_SIZES.SM,
+    fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body,
   },
   selectedCount: {
-    marginTop: DESIGN_CONSTANTS.SPACING.SM,
+    marginTop: DESIGN_CONSTANTS.SPACING.small,
     textAlign: 'center',
     opacity: 0.7,
   },

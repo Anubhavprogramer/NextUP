@@ -21,7 +21,7 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [themePreference, setThemePreferenceState] = useState<ThemePreference>('system');
   const [systemTheme, setSystemTheme] = useState<ColorSchemeName>(
-    Appearance.getColorScheme()
+    Appearance.getColorScheme() || 'light'
   );
 
   // Determine the actual theme to use

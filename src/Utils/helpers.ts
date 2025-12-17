@@ -1,6 +1,13 @@
 // Utility helper functions for NextUP
 
-import { v4 as uuidv4 } from 'uuid';
+// Simple UUID generator for React Native
+const generateUUID = (): string => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
 import { MediaItem, CollectionItem, CollectionStatus, TMDBGenre, VALIDATION_CONSTANTS } from '../Types';
 import { TMDB_CONFIG } from './constants';
 
@@ -8,7 +15,7 @@ import { TMDB_CONFIG } from './constants';
  * Generate a unique UUID
  */
 export const generateId = (): string => {
-  return uuidv4();
+  return generateUUID();
 };
 
 /**
@@ -154,7 +161,7 @@ export const debounce = <T extends (...args: any[]) => any>(
   func: T,
   delay: number
 ): ((...args: Parameters<T>) => void) => {
-  let timeoutId: NodeJS.Timeout;
+  let timeoutId: ReturnType<typeof setTimeout>;
   
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);

@@ -111,6 +111,70 @@ export interface TMDBGenresResponse {
   genres: TMDBGenre[];
 }
 
+// TMDB Detail response types
+export interface TMDBVideo {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  type: string;
+  official: boolean;
+  published_at: string;
+}
+
+export interface TMDBVideosResponse {
+  id: number;
+  results: TMDBVideo[];
+}
+
+export interface TMDBImage {
+  aspect_ratio: number;
+  height: number;
+  iso_639_1: string | null;
+  file_path: string;
+  vote_average: number;
+  vote_count: number;
+  width: number;
+}
+
+export interface TMDBImagesResponse {
+  id: number;
+  backdrops: TMDBImage[];
+  logos: TMDBImage[];
+  posters: TMDBImage[];
+}
+
+export interface TMDBMovieDetails {
+  id: number;
+  title: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  release_date: string;
+  vote_average: number;
+  vote_count: number;
+  runtime: number;
+  genres: TMDBGenre[];
+  videos?: TMDBVideosResponse;
+  images?: TMDBImagesResponse;
+}
+
+export interface TMDBTVDetails {
+  id: number;
+  name: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  first_air_date: string;
+  vote_average: number;
+  vote_count: number;
+  number_of_episodes: number;
+  number_of_seasons: number;
+  genres: TMDBGenre[];
+  videos?: TMDBVideosResponse;
+  images?: TMDBImagesResponse;
+}
+
 // Storage keys
 export const STORAGE_KEYS = {
   USER_PROFILE: 'user_profile',

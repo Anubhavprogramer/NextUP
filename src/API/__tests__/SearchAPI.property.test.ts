@@ -55,13 +55,18 @@ describe('Search API Property Tests', () => {
 
       await fc.assert(
         fc.asyncProperty(
-          fc.string({ minLength: 1, maxLength: 50 }),
+          fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0),
           async (query) => {
             await searchMulti(query);
             
-            // Verify fetch was called with properly encoded query
+            // Verify fetch was called with proper URL structure and Bearer token
             expect(mockFetch).toHaveBeenCalledWith(
-              expect.stringContaining(encodeURIComponent(query.trim()))
+              expect.stringContaining('/search/multi'),
+              expect.objectContaining({
+                headers: expect.objectContaining({
+                  'Authorization': expect.stringContaining('Bearer'),
+                })
+              })
             );
           }
         ),

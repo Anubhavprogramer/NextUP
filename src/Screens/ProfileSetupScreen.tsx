@@ -206,27 +206,27 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: DESIGN_CONSTANTS.CONTAINER_PADDING,
-    paddingVertical: DESIGN_CONSTANTS.SPACING.LG,
+    paddingVertical: DESIGN_CONSTANTS.SPACING.large,
   },
   header: {
     alignItems: 'center',
-    marginBottom: DESIGN_CONSTANTS.SPACING.XXL,
+    marginBottom: DESIGN_CONSTANTS.SPACING.xxlarge,
   },
   title: {
     textAlign: 'center',
-    marginBottom: DESIGN_CONSTANTS.SPACING.MD,
+    marginBottom: DESIGN_CONSTANTS.SPACING.medium,
   },
   subtitle: {
     textAlign: 'center',
     opacity: 0.8,
-    lineHeight: DESIGN_CONSTANTS.FONT_SIZES.MD * 1.5,
+    lineHeight: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body * 1.5,
   },
   form: {
     flex: 1,
-    marginBottom: DESIGN_CONSTANTS.SPACING.LG,
+    marginBottom: DESIGN_CONSTANTS.SPACING.large,
   },
   buttonContainer: {
-    marginBottom: DESIGN_CONSTANTS.SPACING.LG,
+    marginBottom: DESIGN_CONSTANTS.SPACING.large,
   },
   footer: {
     alignItems: 'center',
@@ -234,6 +234,6 @@ const styles = StyleSheet.create({
   footerText: {
     textAlign: 'center',
     opacity: 0.6,
-    lineHeight: DESIGN_CONSTANTS.FONT_SIZES.SM * 1.4,
+    lineHeight: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption * 1.4,
   },
 });

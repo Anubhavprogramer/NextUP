@@ -6,7 +6,7 @@ import { useApp } from '../Store/AppContext';
 import { SearchBar } from '../Components/Regular/SearchBar';
 import { MediaList } from '../Components/Regular/MediaList';
 import { MediaItem, APIError } from '../Types';
-import { searchMulti } from '../API/tmdb';
+import { searchMulti, testTMDBConnection } from '../API/tmdb';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 
 export const SearchScreen: React.FC = () => {
@@ -15,6 +15,11 @@ export const SearchScreen: React.FC = () => {
   const [searchResults, setSearchResults] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentQuery, setCurrentQuery] = useState('');
+
+  // Test API connection on component mount
+  useEffect(() => {
+    testTMDBConnection();
+  }, []);
 
   const handleSearch = useCallback(async (query: string) => {
     setCurrentQuery(query);
@@ -39,19 +44,36 @@ export const SearchScreen: React.FC = () => {
     } catch (error) {
       console.error('Search error:', error);
       
+      let errorMessage = 'An unexpected error occurred. Please try again.';
+      
       if (error instanceof APIError) {
-        Alert.alert(
-          'Search Error',
-          'Unable to search at the moment. Please check your internet connection and try again.',
-          [{ text: 'OK' }]
-        );
-      } else {
-        Alert.alert(
-          'Error',
-          'An unexpected error occurred. Please try again.',
-          [{ text: 'OK' }]
-        );
+        if (error.code === 'NETWORK_ERROR') {
+          errorMessage = 'Network connection failed. Please check your internet connection and try again.';
+        } else if (error.code === 'TMDB_REQUEST_FAILED') {
+          errorMessage = `TMDB API error (${error.status}). Please try again later.`;
+        } else {
+          errorMessage = 'Unable to search at the moment. Please try again.';
+        }
       }
+      
+      Alert.alert(
+        'Search Error',
+        errorMessage,
+        [
+          { text: 'OK' },
+          { 
+            text: 'Test Connection', 
+            onPress: async () => {
+              const isConnected = await testTMDBConnection();
+              Alert.alert(
+                'Connection Test',
+                isConnected ? 'TMDB API is working!' : 'TMDB API connection failed',
+                [{ text: 'OK' }]
+              );
+            }
+          }
+        ]
+      );
       
       setSearchResults([]);
     } finally {
