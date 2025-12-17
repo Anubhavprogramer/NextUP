@@ -39,7 +39,7 @@ export const ThemedCard: React.FC<ThemedCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.LG,
+    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.large,
     padding: DESIGN_CONSTANTS.CARD_PADDING,
     borderWidth: StyleSheet.hairlineWidth,
   },

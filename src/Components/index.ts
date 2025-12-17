@@ -1,4 +1,7 @@
 // Export all components
 
 export * from './Themed';
-// Regular components will be exported here as they are created
+export * from './Regular/GenreSelector';
+export * from './Regular/SearchBar';
+export * from './Regular/MediaCard';
+export * from './Regular/MediaList';

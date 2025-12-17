@@ -3,40 +3,41 @@
 export const DESIGN_CONSTANTS = {
   // Spacing
   SPACING: {
-    XS: 4,
-    SM: 8,
-    MD: 16,
-    LG: 24,
-    XL: 32,
-    XXL: 48,
+    xsmall: 4,
+    small: 8,
+    medium: 16,
+    large: 24,
+    xlarge: 32,
+    xxlarge: 48,
   },
   
   // Border radius
   BORDER_RADIUS: {
-    SM: 4,
-    MD: 8,
-    LG: 12,
-    XL: 16,
-    ROUND: 50,
+    small: 4,
+    medium: 8,
+    large: 12,
+    xlarge: 16,
+    round: 50,
   },
   
   // Typography
-  FONT_SIZES: {
-    XS: 12,
-    SM: 14,
-    MD: 16,
-    LG: 18,
-    XL: 20,
-    XXL: 24,
-    XXXL: 32,
-  },
-  
-  FONT_WEIGHTS: {
-    LIGHT: '300' as const,
-    REGULAR: '400' as const,
-    MEDIUM: '500' as const,
-    SEMIBOLD: '600' as const,
-    BOLD: '700' as const,
+  TYPOGRAPHY: {
+    sizes: {
+      caption: 12,
+      body: 14,
+      subtitle: 16,
+      title: 18,
+      heading: 20,
+      largeTitle: 24,
+      display: 32,
+    },
+    weights: {
+      light: '300' as const,
+      regular: '400' as const,
+      medium: '500' as const,
+      semibold: '600' as const,
+      bold: '700' as const,
+    },
   },
   
   // Layout

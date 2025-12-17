@@ -99,8 +99,8 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     height: DESIGN_CONSTANTS.BUTTON_HEIGHT,
-    paddingHorizontal: DESIGN_CONSTANTS.SPACING.LG,
-    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.MD,
+    paddingHorizontal: DESIGN_CONSTANTS.SPACING.large,
+    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
     justifyContent: 'center',
     alignItems: 'center',
     minWidth: DESIGN_CONSTANTS.MIN_TOUCH_TARGET,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonText: {
-    fontWeight: DESIGN_CONSTANTS.FONT_WEIGHTS.SEMIBOLD,
+    fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.semibold,
     textAlign: 'center',
   },
 });

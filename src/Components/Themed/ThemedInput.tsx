@@ -89,21 +89,21 @@ export const ThemedInput: React.FC<ThemedInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: DESIGN_CONSTANTS.SPACING.MD,
+    marginBottom: DESIGN_CONSTANTS.SPACING.medium,
   },
   label: {
-    marginBottom: DESIGN_CONSTANTS.SPACING.XS,
-    fontWeight: DESIGN_CONSTANTS.FONT_WEIGHTS.MEDIUM,
+    marginBottom: DESIGN_CONSTANTS.SPACING.xsmall,
+    fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.medium,
   },
   input: {
     height: DESIGN_CONSTANTS.INPUT_HEIGHT,
     borderWidth: 1,
-    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.MD,
-    paddingHorizontal: DESIGN_CONSTANTS.SPACING.MD,
-    fontSize: DESIGN_CONSTANTS.FONT_SIZES.MD,
+    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
+    paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
+    fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body,
   },
   helperText: {
-    marginTop: DESIGN_CONSTANTS.SPACING.XS,
-    marginLeft: DESIGN_CONSTANTS.SPACING.XS,
+    marginTop: DESIGN_CONSTANTS.SPACING.xsmall,
+    marginLeft: DESIGN_CONSTANTS.SPACING.xsmall,
   },
 });

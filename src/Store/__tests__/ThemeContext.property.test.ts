@@ -86,27 +86,27 @@ describe('Theme System Property Tests', () => {
           () => {
             const spacing = DESIGN_CONSTANTS.SPACING;
             const borderRadius = DESIGN_CONSTANTS.BORDER_RADIUS;
-            const fontSize = DESIGN_CONSTANTS.FONT_SIZES;
+            const fontSize = DESIGN_CONSTANTS.TYPOGRAPHY.sizes;
             
             // Spacing should be in ascending order
-            expect(spacing.XS).toBeLessThan(spacing.SM);
-            expect(spacing.SM).toBeLessThan(spacing.MD);
-            expect(spacing.MD).toBeLessThan(spacing.LG);
-            expect(spacing.LG).toBeLessThan(spacing.XL);
-            expect(spacing.XL).toBeLessThan(spacing.XXL);
+            expect(spacing.xsmall).toBeLessThan(spacing.small);
+            expect(spacing.small).toBeLessThan(spacing.medium);
+            expect(spacing.medium).toBeLessThan(spacing.large);
+            expect(spacing.large).toBeLessThan(spacing.xlarge);
+            expect(spacing.xlarge).toBeLessThan(spacing.xxlarge);
             
-            // Border radius should be in ascending order (except ROUND)
-            expect(borderRadius.SM).toBeLessThan(borderRadius.MD);
-            expect(borderRadius.MD).toBeLessThan(borderRadius.LG);
-            expect(borderRadius.LG).toBeLessThan(borderRadius.XL);
+            // Border radius should be in ascending order (except round)
+            expect(borderRadius.small).toBeLessThan(borderRadius.medium);
+            expect(borderRadius.medium).toBeLessThan(borderRadius.large);
+            expect(borderRadius.large).toBeLessThan(borderRadius.xlarge);
             
             // Font sizes should be in ascending order
-            expect(fontSize.XS).toBeLessThan(fontSize.SM);
-            expect(fontSize.SM).toBeLessThan(fontSize.MD);
-            expect(fontSize.MD).toBeLessThan(fontSize.LG);
-            expect(fontSize.LG).toBeLessThan(fontSize.XL);
-            expect(fontSize.XL).toBeLessThan(fontSize.XXL);
-            expect(fontSize.XXL).toBeLessThan(fontSize.XXXL);
+            expect(fontSize.caption).toBeLessThan(fontSize.body);
+            expect(fontSize.body).toBeLessThan(fontSize.subtitle);
+            expect(fontSize.subtitle).toBeLessThan(fontSize.title);
+            expect(fontSize.title).toBeLessThan(fontSize.heading);
+            expect(fontSize.heading).toBeLessThan(fontSize.largeTitle);
+            expect(fontSize.largeTitle).toBeLessThan(fontSize.display);
             
             // Touch targets should meet accessibility requirements
             expect(DESIGN_CONSTANTS.MIN_TOUCH_TARGET).toBeGreaterThanOrEqual(44);

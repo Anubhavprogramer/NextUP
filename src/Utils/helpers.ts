@@ -1,7 +1,7 @@
 // Utility helper functions for NextUP
 
 import { v4 as uuidv4 } from 'uuid';
-import { MediaItem, CollectionItem, CollectionStatus, TMDBGenre } from '../Types';
+import { MediaItem, CollectionItem, CollectionStatus, TMDBGenre, VALIDATION_CONSTANTS } from '../Types';
 import { TMDB_CONFIG } from './constants';
 
 /**
@@ -172,12 +172,16 @@ export const validateUserProfile = (profile: {
 }): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
   
-  if (!profile.name || profile.name.trim().length === 0) {
+  if (!profile.name || profile.name.trim().length < VALIDATION_CONSTANTS.MIN_NAME_LENGTH) {
     errors.push('Name is required');
   }
   
-  if (!profile.age || profile.age < 1 || profile.age > 120) {
-    errors.push('Age must be between 1 and 120');
+  if (profile.name && profile.name.length > VALIDATION_CONSTANTS.MAX_NAME_LENGTH) {
+    errors.push(`Name cannot exceed ${VALIDATION_CONSTANTS.MAX_NAME_LENGTH} characters`);
+  }
+  
+  if (!profile.age || profile.age < VALIDATION_CONSTANTS.MIN_AGE || profile.age > VALIDATION_CONSTANTS.MAX_AGE) {
+    errors.push(`Age must be between ${VALIDATION_CONSTANTS.MIN_AGE} and ${VALIDATION_CONSTANTS.MAX_AGE}`);
   }
   
   if (!profile.preferredGenres || profile.preferredGenres.length === 0) {
@@ -290,3 +294,7 @@ export const calculateCollectionStats = (collections: {
     tvShows: tvCount,
   };
 };
+
+// Aliases for consistency with MediaCard component
+export const formatReleaseDate = formatYear;
+export const getImageUrl = getTMDBImageUrl;

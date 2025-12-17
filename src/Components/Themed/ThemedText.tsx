@@ -39,23 +39,23 @@ export const ThemedText: React.FC<ThemedTextProps> = ({
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: DESIGN_CONSTANTS.FONT_SIZES.XXL,
-    fontWeight: DESIGN_CONSTANTS.FONT_WEIGHTS.BOLD,
-    lineHeight: DESIGN_CONSTANTS.FONT_SIZES.XXL * 1.2,
+    fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.largeTitle,
+    fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.bold,
+    lineHeight: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.largeTitle * 1.2,
   },
   subtitle: {
-    fontSize: DESIGN_CONSTANTS.FONT_SIZES.LG,
-    fontWeight: DESIGN_CONSTANTS.FONT_WEIGHTS.SEMIBOLD,
-    lineHeight: DESIGN_CONSTANTS.FONT_SIZES.LG * 1.3,
+    fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.title,
+    fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.semibold,
+    lineHeight: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.title * 1.3,
   },
   body: {
-    fontSize: DESIGN_CONSTANTS.FONT_SIZES.MD,
-    fontWeight: DESIGN_CONSTANTS.FONT_WEIGHTS.REGULAR,
-    lineHeight: DESIGN_CONSTANTS.FONT_SIZES.MD * 1.4,
+    fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body,
+    fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.regular,
+    lineHeight: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body * 1.4,
   },
   caption: {
-    fontSize: DESIGN_CONSTANTS.FONT_SIZES.SM,
-    fontWeight: DESIGN_CONSTANTS.FONT_WEIGHTS.REGULAR,
-    lineHeight: DESIGN_CONSTANTS.FONT_SIZES.SM * 1.3,
+    fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption,
+    fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.regular,
+    lineHeight: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption * 1.3,
   },
 });
