@@ -10,7 +10,7 @@ import { ThemedCard } from '../Components/Themed/ThemedCard';
 import { CollectionSection } from '../Components/Regular/CollectionSection';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
-import { RootStackParamList, CollectionItem } from '../Types';
+import { RootStackParamList, CollectionItem, CollectionStatus } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { calculateCollectionStats } from '../Utils/helpers';
 
@@ -200,7 +200,7 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <ThemedText variant="title" style={styles.welcomeText}>
-              Welcome back, {userProfile?.name}!
+              Hi, {userProfile?.name}!
             </ThemedText>
             <ThemedText variant="body" style={styles.subtitle}>
               Track your favorite movies and TV shows
@@ -255,7 +255,7 @@ export const HomeScreen: React.FC = () => {
                       {stats.willWatch}
                     </ThemedText>
                     <ThemedText variant="caption" style={styles.statLabel}>
-                      Want to Watch
+                      Wishlist
                     </ThemedText>
                   </View>
                 </ThemedCard>

@@ -52,7 +52,7 @@ export const AppNavigator: React.FC = () => {
           name="Search" 
           component={SearchScreen}
           options={{
-            headerShown: true,
+            headerShown: false,
             title: 'Search Movies & TV Shows',
             headerBackTitleVisible: false,
           }}
@@ -69,7 +69,7 @@ export const AppNavigator: React.FC = () => {
           name="MediaDetail" 
           component={MediaDetailScreen}
           options={{
-            headerShown: true,
+            headerShown: false,
             headerBackTitleVisible: false,
             title: 'Media Details',
           }}
