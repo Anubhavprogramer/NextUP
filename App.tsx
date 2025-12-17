@@ -8,6 +8,7 @@ import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/Store/ThemeContext';
 import { AppProvider } from './src/Store/AppContext';
+import { ToastProvider } from './src/Store/ToastContext';
 import { AppNavigator } from './src/Navigation/AppNavigator';
 
 function App() {
@@ -15,7 +16,9 @@ function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AppProvider>
-          <AppContent />
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
         </AppProvider>
       </ThemeProvider>
     </SafeAreaProvider>

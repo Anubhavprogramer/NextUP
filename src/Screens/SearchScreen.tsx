@@ -3,6 +3,7 @@ import { View, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
+import { useToast } from '../Store/ToastContext';
 import { SearchBar } from '../Components/Regular/SearchBar';
 import { MediaList } from '../Components/Regular/MediaList';
 import { MediaItem, APIError } from '../Types';
@@ -12,6 +13,7 @@ import { runFullDebug } from '../API/debug';
 export const SearchScreen: React.FC = () => {
   const { theme } = useTheme();
   const { addToCollection, findItemByMediaId } = useApp();
+  const { showSuccess, showError, showInfo } = useToast();
   const [searchResults, setSearchResults] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentQuery, setCurrentQuery] = useState('');
@@ -56,21 +58,7 @@ export const SearchScreen: React.FC = () => {
         }
       }
       
-      Alert.alert(
-        'Search Error',
-        errorMessage,
-        [
-          { text: 'OK' },
-          { 
-            text: 'Debug', 
-            onPress: async () => {
-              console.log('🧪 Running debug from SearchScreen...');
-              await runFullDebug();
-              Alert.alert('Debug Complete', 'Check console for debug output', [{ text: 'OK' }]);
-            }
-          }
-        ]
-      );
+      showError(errorMessage);
       
       setSearchResults([]);
     } finally {
@@ -83,11 +71,8 @@ export const SearchScreen: React.FC = () => {
     const existingItem = findItemByMediaId(mediaItem.id);
     
     if (existingItem) {
-      Alert.alert(
-        'Already in Collection',
-        `This ${mediaItem.mediaType === 'movie' ? 'movie' : 'TV show'} is already in your ${existingItem.status.replace('_', ' ')} collection.`,
-        [{ text: 'OK' }]
-      );
+      const statusLabel = existingItem.status.replace('_', ' ');
+      showInfo(`Already in ${statusLabel} collection`);
       return;
     }
 
@@ -111,7 +96,7 @@ export const SearchScreen: React.FC = () => {
         },
       ]
     );
-  }, [findItemByMediaId]);
+  }, [findItemByMediaId, showInfo]);
 
   const handleAddToCollection = useCallback(async (
     mediaItem: MediaItem, 
@@ -123,20 +108,12 @@ export const SearchScreen: React.FC = () => {
       const statusName = status === 'will_watch' ? 'Want to Watch' : 
                         status === 'watching' ? 'Currently Watching' : 'Watched';
       
-      Alert.alert(
-        'Added Successfully',
-        `"${mediaItem.title}" has been added to your ${statusName} collection.`,
-        [{ text: 'OK' }]
-      );
+      showSuccess(`Added to ${statusName}`);
     } catch (error) {
       console.error('Add to collection error:', error);
-      Alert.alert(
-        'Error',
-        'Unable to add to collection. Please try again.',
-        [{ text: 'OK' }]
-      );
+      showError('Unable to add to collection');
     }
-  }, [addToCollection]);
+  }, [addToCollection, showSuccess, showError]);
 
   const handleRefresh = useCallback(() => {
     if (currentQuery) {

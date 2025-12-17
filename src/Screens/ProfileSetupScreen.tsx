@@ -5,7 +5,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -16,6 +15,7 @@ import {
 } from '../Components/Themed';
 import { GenreSelector } from '../Components/Regular/GenreSelector';
 import { useTheme } from '../Store/ThemeContext';
+import { useToast } from '../Store/ToastContext';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { dataManager } from '../Manager/DataManager';
 import { validateUserProfile } from '../Utils/helpers';
@@ -29,6 +29,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
   onProfileCreated,
 }) => {
   const { theme } = useTheme();
+  const { showError } = useToast();
   const [formData, setFormData] = useState<ProfileFormData>({
     name: '',
     age: '',
@@ -91,11 +92,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
       onProfileCreated();
     } catch (error) {
       console.error('Failed to create profile:', error);
-      Alert.alert(
-        'Error',
-        'Failed to create your profile. Please try again.',
-        [{ text: 'OK' }]
-      );
+      showError('Failed to create your profile. Please try again.');
     } finally {
       setLoading(false);
     }

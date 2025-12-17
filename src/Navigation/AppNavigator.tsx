@@ -61,7 +61,7 @@ export const AppNavigator: React.FC = () => {
           name="Collection" 
           component={CollectionScreen}
           options={{
-            headerShown: true,
+            headerShown: false,
             headerBackTitleVisible: false,
           }}
         />

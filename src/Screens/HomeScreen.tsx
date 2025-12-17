@@ -10,6 +10,7 @@ import { ThemedCard } from '../Components/Themed/ThemedCard';
 import { CollectionSection } from '../Components/Regular/CollectionSection';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
+import { useToast } from '../Store/ToastContext';
 import { RootStackParamList, CollectionItem, CollectionStatus } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { calculateCollectionStats } from '../Utils/helpers';
@@ -20,6 +21,7 @@ export const HomeScreen: React.FC = () => {
   const { theme } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { userProfile, appState, getCollectionByStatus, updateItemStatus, removeFromCollection } = useApp();
+  const { showSuccess, showError } = useToast();
 
   const stats = appState?.collections ? calculateCollectionStats(appState.collections) : null;
 
@@ -56,50 +58,22 @@ export const HomeScreen: React.FC = () => {
   const handleStatusChange = async (item: CollectionItem, newStatus: CollectionStatus) => {
     try {
       await updateItemStatus(item.id, newStatus);
-      Alert.alert(
-        'Status Updated',
-        `"${item.mediaItem.title}" has been moved to ${newStatus.replace('_', ' ')}.`,
-        [{ text: 'OK' }]
-      );
+      const statusLabel = newStatus.replace('_', ' ');
+      showSuccess(`Moved to ${statusLabel}`);
     } catch (error) {
       console.error('Status change error:', error);
-      Alert.alert(
-        'Error',
-        'Unable to change status. Please try again.',
-        [{ text: 'OK' }]
-      );
+      showError('Unable to change status');
     }
   };
 
-  const handleRemoveItem = (item: CollectionItem) => {
-    Alert.alert(
-      'Remove Item',
-      `Are you sure you want to remove "${item.mediaItem.title}" from your collection?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeFromCollection(item.id);
-              Alert.alert(
-                'Removed',
-                `"${item.mediaItem.title}" has been removed from your collection.`,
-                [{ text: 'OK' }]
-              );
-            } catch (error) {
-              console.error('Remove error:', error);
-              Alert.alert(
-                'Error',
-                'Unable to remove item. Please try again.',
-                [{ text: 'OK' }]
-              );
-            }
-          },
-        },
-      ]
-    );
+  const handleRemoveItem = async (item: CollectionItem) => {
+    try {
+      await removeFromCollection(item.id);
+      showSuccess('Removed from collection');
+    } catch (error) {
+      console.error('Remove error:', error);
+      showError('Unable to remove item');
+    }
   };
 
   const handleSeeAll = (status: CollectionStatus) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Image, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -7,9 +7,9 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemedView } from '../Components/Themed/ThemedView';
 import { ThemedText } from '../Components/Themed/ThemedText';
-import { ThemedButton } from '../Components/Themed/ThemedButton';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
+import { useToast } from '../Store/ToastContext';
 import { RootStackParamList, CollectionStatus } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { formatReleaseDate, getTMDBImageUrl } from '../Utils/helpers';
@@ -22,6 +22,7 @@ export const MediaDetailScreen: React.FC = () => {
   const route = useRoute<MediaDetailScreenRouteProp>();
   const navigation = useNavigation<MediaDetailScreenNavigationProp>();
   const { findItemByMediaId, addToCollection, updateItemStatus, removeFromCollection } = useApp();
+  const { showSuccess, showError } = useToast();
   
   const { mediaItem } = route.params;
   
@@ -40,9 +41,10 @@ export const MediaDetailScreen: React.FC = () => {
   const handleAddToCollection = async (status: CollectionStatus) => {
     try {
       await addToCollection(mediaItem, status);
-      Alert.alert('Success', `Added "${mediaItem.title}" to ${status.replace('_', ' ')}`);
+      const statusLabel = status.replace('_', ' ');
+      showSuccess(`Added to ${statusLabel}`);
     } catch (error) {
-      Alert.alert('Error', 'Failed to add to collection');
+      showError('Failed to add to collection');
     }
   };
 
@@ -51,34 +53,23 @@ export const MediaDetailScreen: React.FC = () => {
 
     try {
       await updateItemStatus(collectionItem.id, newStatus);
-      Alert.alert('Success', `Moved "${mediaItem.title}" to ${newStatus.replace('_', ' ')}`);
+      const statusLabel = newStatus.replace('_', ' ');
+      showSuccess(`Moved to ${statusLabel}`);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update status');
+      showError('Failed to update status');
     }
   };
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (!collectionItem) return;
 
-    Alert.alert(
-      'Remove Item',
-      `Are you sure you want to remove "${mediaItem.title}" from your collection?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await removeFromCollection(collectionItem.id);
-              navigation.goBack();
-            } catch (error) {
-              Alert.alert('Error', 'Failed to remove item');
-            }
-          },
-        },
-      ]
-    );
+    try {
+      await removeFromCollection(collectionItem.id);
+      showSuccess('Removed from collection');
+      navigation.goBack();
+    } catch (error) {
+      showError('Failed to remove item');
+    }
   };
 
   React.useLayoutEffect(() => {
@@ -252,14 +243,6 @@ export const MediaDetailScreen: React.FC = () => {
                         size={20} 
                         color={collectionItem.status === 'will_watch' ? theme.colors.background : theme.colors.warning} 
                       />
-                      {/* <ThemedText 
-                        style={[
-                          styles.statusButtonText,
-                          collectionItem.status === 'will_watch' && styles.statusButtonTextActive
-                        ]}
-                      >
-                        Want to Watch
-                      </ThemedText> */}
                     </TouchableOpacity>
                     
                     <TouchableOpacity
@@ -274,14 +257,6 @@ export const MediaDetailScreen: React.FC = () => {
                         size={20} 
                         color={collectionItem.status === 'watching' ? theme.colors.background : theme.colors.primary} 
                       />
-                      {/* <ThemedText 
-                        style={[
-                          styles.statusButtonText,
-                          collectionItem.status === 'watching' && styles.statusButtonTextActive
-                        ]}
-                      >
-                        Watching
-                      </ThemedText> */}
                     </TouchableOpacity>
                     
                     <TouchableOpacity
@@ -296,14 +271,6 @@ export const MediaDetailScreen: React.FC = () => {
                         size={20} 
                         color={collectionItem.status === 'watched' ? theme.colors.background : theme.colors.success} 
                       />
-                      {/* <ThemedText 
-                        style={[
-                          styles.statusButtonText,
-                          collectionItem.status === 'watched' && styles.statusButtonTextActive
-                        ]}
-                      >
-                        Watched
-                      </ThemedText> */}
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -316,16 +283,8 @@ export const MediaDetailScreen: React.FC = () => {
                       <Icon 
                         name="trash-bin" 
                         size={20} 
-                        color={collectionItem.status === 'watched' ? theme.colors.error : theme.colors.success} 
+                        color={theme.colors.error} 
                       />
-                      {/* <ThemedText 
-                        style={[
-                          styles.statusButtonText,
-                          collectionItem.status === 'watched' && styles.statusButtonTextActive
-                        ]}
-                      >
-                        Watched
-                      </ThemedText> */}
                     </TouchableOpacity>
                   </View>
                   
