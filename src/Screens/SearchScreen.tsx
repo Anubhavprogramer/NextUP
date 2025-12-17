@@ -7,6 +7,7 @@ import { SearchBar } from '../Components/Regular/SearchBar';
 import { MediaList } from '../Components/Regular/MediaList';
 import { MediaItem, APIError } from '../Types';
 import { searchMulti, testTMDBConnection } from '../API/tmdb';
+import { runFullDebug } from '../API/debug';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 
 export const SearchScreen: React.FC = () => {
@@ -62,14 +63,11 @@ export const SearchScreen: React.FC = () => {
         [
           { text: 'OK' },
           { 
-            text: 'Test Connection', 
+            text: 'Debug', 
             onPress: async () => {
-              const isConnected = await testTMDBConnection();
-              Alert.alert(
-                'Connection Test',
-                isConnected ? 'TMDB API is working!' : 'TMDB API connection failed',
-                [{ text: 'OK' }]
-              );
+              console.log('🧪 Running debug from SearchScreen...');
+              await runFullDebug();
+              Alert.alert('Debug Complete', 'Check console for debug output', [{ text: 'OK' }]);
             }
           }
         ]

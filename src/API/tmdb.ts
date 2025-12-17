@@ -28,18 +28,19 @@ export async function tmdbFetch<T>(endpoint: string, params: Record<string, stri
   try {
     console.log('🔍 TMDB API Request:', url);
     
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
+    // Simplified fetch for React Native compatibility
+    const res = await fetch(url);
 
     console.log('📡 TMDB API Response Status:', res.status);
 
     if (!res.ok) {
-      const errorText = await res.text();
+      let errorText = 'Unknown error';
+      try {
+        errorText = await res.text();
+      } catch (e) {
+        console.warn('Could not read error response text');
+      }
+      
       console.error('❌ TMDB API Error Response:', errorText);
       throw new APIError(
         `TMDB request failed: ${res.status} ${res.statusText}`,
@@ -49,7 +50,7 @@ export async function tmdbFetch<T>(endpoint: string, params: Record<string, stri
     }
 
     const data = await res.json();
-    console.log('✅ TMDB API Success:', data.total_results || 'N/A', 'results');
+    console.log('✅ TMDB API Success:', data.total_results || data.results?.length || 'N/A', 'results');
     return data;
   } catch (error) {
     console.error('🚨 TMDB API Error:', error);
@@ -58,8 +59,12 @@ export async function tmdbFetch<T>(endpoint: string, params: Record<string, stri
       throw error;
     }
     
-    // Handle network errors more gracefully
-    if (error instanceof TypeError && error.message.includes('Network request failed')) {
+    // Handle different types of network errors
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
+    if (errorMessage.includes('Network request failed') || 
+        errorMessage.includes('fetch') || 
+        errorMessage.includes('connection')) {
       throw new APIError(
         'Network connection failed. Please check your internet connection.',
         'NETWORK_ERROR'
@@ -67,7 +72,7 @@ export async function tmdbFetch<T>(endpoint: string, params: Record<string, stri
     }
     
     throw new APIError(
-      `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      `Network error: ${errorMessage}`,
       'NETWORK_ERROR'
     );
   }
