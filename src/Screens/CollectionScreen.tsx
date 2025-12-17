@@ -39,28 +39,8 @@ export const CollectionScreen: React.FC = () => {
   };
 
   const handleItemPress = useCallback((mediaItem: any) => {
-    // Find the collection item
-    const collectionItem = items.find(item => item.mediaItem.id === mediaItem.id);
-    if (!collectionItem) return;
-
-    // Show options for the item
-    Alert.alert(
-      mediaItem.title,
-      'What would you like to do?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Change Status',
-          onPress: () => showStatusChangeOptions(collectionItem),
-        },
-        {
-          text: 'Remove from Collection',
-          style: 'destructive',
-          onPress: () => handleRemoveItem(collectionItem),
-        },
-      ]
-    );
-  }, [items]);
+    navigation.navigate('MediaDetail', { mediaItem });
+  }, [navigation]);
 
   const showStatusChangeOptions = (item: CollectionItem) => {
     const currentStatus = item.status;

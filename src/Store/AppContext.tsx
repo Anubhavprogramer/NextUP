@@ -14,6 +14,9 @@ interface AppContextType {
   addToCollection: (mediaItem: MediaItem, status: CollectionStatus) => Promise<CollectionItem>;
   removeFromCollection: (itemId: string) => Promise<void>;
   updateItemStatus: (itemId: string, newStatus: CollectionStatus) => Promise<CollectionItem>;
+  updateItemRating: (itemId: string, rating: number) => Promise<CollectionItem>;
+  updateItemNotes: (itemId: string, notes: string) => Promise<CollectionItem>;
+  updateItemProgress: (itemId: string, progress: number) => Promise<CollectionItem>;
   findItemByMediaId: (mediaId: number) => CollectionItem | null;
   getCollectionByStatus: (status: CollectionStatus) => CollectionItem[];
 }
@@ -85,6 +88,24 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return updatedItem;
   };
 
+  const updateItemRating = async (itemId: string, rating: number): Promise<CollectionItem> => {
+    const updatedItem = await dataManager.updateItemRating(itemId, rating);
+    await refreshAppState(); // Refresh to get updated collections
+    return updatedItem;
+  };
+
+  const updateItemNotes = async (itemId: string, notes: string): Promise<CollectionItem> => {
+    const updatedItem = await dataManager.updateItemNotes(itemId, notes);
+    await refreshAppState(); // Refresh to get updated collections
+    return updatedItem;
+  };
+
+  const updateItemProgress = async (itemId: string, progress: number): Promise<CollectionItem> => {
+    const updatedItem = await dataManager.updateItemProgress(itemId, progress);
+    await refreshAppState(); // Refresh to get updated collections
+    return updatedItem;
+  };
+
   const findItemByMediaId = (mediaId: number): CollectionItem | null => {
     if (!appState?.collections) return null;
     
@@ -113,6 +134,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     addToCollection,
     removeFromCollection,
     updateItemStatus,
+    updateItemRating,
+    updateItemNotes,
+    updateItemProgress,
     findItemByMediaId,
     getCollectionByStatus,
   };

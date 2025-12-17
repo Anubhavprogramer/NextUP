@@ -5,6 +5,7 @@ import { ProfileSetupScreen } from '../Screens/ProfileSetupScreen';
 import { HomeScreen } from '../Screens/HomeScreen';
 import { SearchScreen } from '../Screens/SearchScreen';
 import { CollectionScreen } from '../Screens/CollectionScreen';
+import { MediaDetailScreen } from '../Screens/MediaDetailScreen';
 import { LoadingScreen } from '../Screens/LoadingScreen';
 import { ErrorScreen } from '../Screens/ErrorScreen';
 import { useApp } from '../Store/AppContext';
@@ -46,7 +47,7 @@ export const AppNavigator: React.FC = () => {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="Main" component={HomeScreen} />
+        <Stack.Screen name="Main" component={HomeScreen}/>
         <Stack.Screen 
           name="Search" 
           component={SearchScreen}
@@ -62,6 +63,15 @@ export const AppNavigator: React.FC = () => {
           options={{
             headerShown: true,
             headerBackTitleVisible: false,
+          }}
+        />
+        <Stack.Screen 
+          name="MediaDetail" 
+          component={MediaDetailScreen}
+          options={{
+            headerShown: true,
+            headerBackTitleVisible: false,
+            title: 'Media Details',
           }}
         />
       </Stack.Navigator>

@@ -9,6 +9,7 @@ import { formatReleaseDate, getTMDBImageUrl } from '../../Utils/helpers';
 export const MediaCard: React.FC<MediaCardProps> = ({
   mediaItem,
   onPress,
+  onLongPress,
   showStatus = false,
   collectionStatus,
 }) => {
@@ -40,6 +41,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     }
   };
 
+  const statusColor = getStatusColor();
+  
   const styles = StyleSheet.create({
     container: {
       backgroundColor: theme.colors.surface,
@@ -51,6 +54,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
+      borderWidth: showStatus && collectionStatus ? 1 : 0,
+      borderColor: showStatus && collectionStatus ? statusColor : 'transparent',
     },
     content: {
       flexDirection: 'row',
@@ -87,6 +92,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       color: theme.colors.text,
       flex: 1,
       marginRight: DESIGN_CONSTANTS.SPACING.small,
+      flexWrap: 'wrap',
     },
     statusIcon: {
       marginLeft: DESIGN_CONSTANTS.SPACING.small,
@@ -96,6 +102,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       color: theme.colors.textSecondary,
       lineHeight: 18,
       marginBottom: DESIGN_CONSTANTS.SPACING.small,
+      flexShrink: 1,
     },
     metadata: {
       flexDirection: 'row',
@@ -112,6 +119,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption,
       color: theme.colors.textSecondary,
       marginLeft: DESIGN_CONSTANTS.SPACING.xsmall,
+      flexShrink: 1,
     },
     mediaType: {
       fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption,
@@ -119,6 +127,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.medium,
       textTransform: 'uppercase',
       letterSpacing: 0.5,
+      flexShrink: 0,
     },
   });
 
@@ -128,7 +137,12 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     : mediaItem.overview;
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity 
+      style={styles.container} 
+      onPress={onPress} 
+      onLongPress={onLongPress}
+      activeOpacity={0.7}
+    >
       <View style={styles.content}>
         {posterUrl ? (
           <Image source={{ uri: posterUrl }} style={styles.poster} resizeMode="cover" />
@@ -147,7 +161,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
               <Icon
                 name={getStatusIcon()!}
                 size={20}
-                color={getStatusColor()}
+                color={statusColor}
                 style={styles.statusIcon}
               />
             )}

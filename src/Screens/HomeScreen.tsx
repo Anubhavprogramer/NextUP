@@ -19,17 +19,86 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'M
 export const HomeScreen: React.FC = () => {
   const { theme } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { userProfile, appState, getCollectionByStatus } = useApp();
+  const { userProfile, appState, getCollectionByStatus, updateItemStatus, removeFromCollection } = useApp();
 
   const stats = appState?.collections ? calculateCollectionStats(appState.collections) : null;
 
   const handleItemPress = (item: CollectionItem) => {
-    // For now, show an alert with item details
-    // Later this can navigate to a detail screen
+    navigation.navigate('MediaDetail', { mediaItem: item.mediaItem });
+  };
+
+  const handleItemLongPress = (item: CollectionItem) => {
+    const currentStatus = item.status;
+    const statusOptions = [
+      { status: 'will_watch' as CollectionStatus, label: 'Want to Watch' },
+      { status: 'watching' as CollectionStatus, label: 'Currently Watching' },
+      { status: 'watched' as CollectionStatus, label: 'Watched' },
+    ].filter(option => option.status !== currentStatus);
+
     Alert.alert(
-      item.mediaItem.title,
-      `Status: ${item.status.replace('_', ' ')}\nAdded: ${new Date(item.addedAt).toLocaleDateString()}`,
-      [{ text: 'OK' }]
+      'Manage Item',
+      `"${item.mediaItem.title}" - What would you like to do?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        ...statusOptions.map(option => ({
+          text: `Move to ${option.label}`,
+          onPress: () => handleStatusChange(item, option.status),
+        })),
+        {
+          text: 'Remove from Collection',
+          style: 'destructive',
+          onPress: () => handleRemoveItem(item),
+        },
+      ]
+    );
+  };
+
+  const handleStatusChange = async (item: CollectionItem, newStatus: CollectionStatus) => {
+    try {
+      await updateItemStatus(item.id, newStatus);
+      Alert.alert(
+        'Status Updated',
+        `"${item.mediaItem.title}" has been moved to ${newStatus.replace('_', ' ')}.`,
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('Status change error:', error);
+      Alert.alert(
+        'Error',
+        'Unable to change status. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
+  const handleRemoveItem = (item: CollectionItem) => {
+    Alert.alert(
+      'Remove Item',
+      `Are you sure you want to remove "${item.mediaItem.title}" from your collection?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await removeFromCollection(item.id);
+              Alert.alert(
+                'Removed',
+                `"${item.mediaItem.title}" has been removed from your collection.`,
+                [{ text: 'OK' }]
+              );
+            } catch (error) {
+              console.error('Remove error:', error);
+              Alert.alert(
+                'Error',
+                'Unable to remove item. Please try again.',
+                [{ text: 'OK' }]
+              );
+            }
+          },
+        },
+      ]
     );
   };
 
@@ -201,6 +270,7 @@ export const HomeScreen: React.FC = () => {
                 title="Currently Watching"
                 items={watchingItems}
                 onItemPress={handleItemPress}
+                onItemLongPress={handleItemLongPress}
                 onSeeAll={() => handleSeeAll('watching')}
               />
               
@@ -208,6 +278,7 @@ export const HomeScreen: React.FC = () => {
                 title="Want to Watch"
                 items={willWatchItems}
                 onItemPress={handleItemPress}
+                onItemLongPress={handleItemLongPress}
                 onSeeAll={() => handleSeeAll('will_watch')}
               />
               
@@ -215,6 +286,7 @@ export const HomeScreen: React.FC = () => {
                 title="Watched"
                 items={watchedItems}
                 onItemPress={handleItemPress}
+                onItemLongPress={handleItemLongPress}
                 onSeeAll={() => handleSeeAll('watched')}
               />
             </>

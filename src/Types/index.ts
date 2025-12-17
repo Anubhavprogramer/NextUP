@@ -60,6 +60,7 @@ export interface ThemedComponentProps {
 export interface MediaCardProps {
   mediaItem: MediaItem;
   onPress?: () => void;
+  onLongPress?: () => void;
   showStatus?: boolean;
   collectionStatus?: CollectionStatus;
 }

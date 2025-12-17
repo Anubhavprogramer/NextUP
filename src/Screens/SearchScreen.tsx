@@ -162,7 +162,7 @@ export const SearchScreen: React.FC = () => {
   });
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <SearchBar
         onSearch={handleSearch}
         placeholder="Search movies and TV shows..."

@@ -10,6 +10,7 @@ interface CollectionSectionProps {
   title: string;
   items: CollectionItem[];
   onItemPress?: (item: CollectionItem) => void;
+  onItemLongPress?: (item: CollectionItem) => void;
   onSeeAll?: () => void;
 }
 
@@ -17,6 +18,7 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
   title,
   items,
   onItemPress,
+  onItemLongPress,
   onSeeAll,
 }) => {
   const { theme } = useTheme();
@@ -95,6 +97,7 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
             <MediaCard
               mediaItem={item.mediaItem}
               onPress={() => onItemPress?.(item)}
+              onLongPress={() => onItemLongPress?.(item)}
               showStatus={false}
               collectionStatus={item.status}
             />

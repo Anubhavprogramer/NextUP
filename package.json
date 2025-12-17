@@ -9,7 +9,9 @@
     "start": "react-native start",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "setup-fonts": "./scripts/setup-fonts.sh",
+    "clean-build": "npx react-native clean && cd android && ./gradlew clean && cd .."
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
