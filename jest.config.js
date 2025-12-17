@@ -13,4 +13,10 @@ module.exports = {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(uuid|@react-native|react-native)/)',
+  ],
+  moduleNameMapper: {
+    '^uuid$': '<rootDir>/node_modules/uuid/dist/index.js',
+  },
 };
