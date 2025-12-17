@@ -44,8 +44,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     container: {
       backgroundColor: theme.colors.surface,
       borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
-      marginHorizontal: DESIGN_CONSTANTS.SPACING.medium,
-      marginVertical: DESIGN_CONSTANTS.SPACING.small,
+      width: '100%',
       overflow: 'hidden',
       elevation: 2,
       shadowColor: theme.colors.shadow,

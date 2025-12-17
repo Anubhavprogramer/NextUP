@@ -8,7 +8,6 @@ import { MediaList } from '../Components/Regular/MediaList';
 import { MediaItem, APIError } from '../Types';
 import { searchMulti, testTMDBConnection } from '../API/tmdb';
 import { runFullDebug } from '../API/debug';
-import { DESIGN_CONSTANTS } from '../Utils/constants';
 
 export const SearchScreen: React.FC = () => {
   const { theme } = useTheme();

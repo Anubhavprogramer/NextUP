@@ -80,18 +80,11 @@ export interface SearchBarProps {
 
 // Navigation types
 export type RootStackParamList = {
-  ProfileSetup: undefined;
   Main: undefined;
+  Search: undefined;
+  Collection: { status: CollectionStatus };
   MediaDetail: { mediaItem: MediaItem };
   Settings: undefined;
-};
-
-export type MainTabParamList = {
-  Home: undefined;
-  Search: undefined;
-  Watched: undefined;
-  Watching: undefined;
-  WillWatch: undefined;
 };
 
 // API response types
