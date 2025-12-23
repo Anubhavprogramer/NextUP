@@ -75,7 +75,7 @@ export const LIGHT_THEME = {
     backgroundTertiary: '#FFFFFF',
     
     // Surface colors
-    surface: '#FFFFFF',
+    surface: '#d7c7aaff',
     surfaceSecondary: '#F2F2F7',
     
     // Text colors
