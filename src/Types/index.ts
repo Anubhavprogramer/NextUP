@@ -3,8 +3,6 @@
 export interface UserProfile {
   id: string;
   name: string;
-  age: number;
-  preferredGenres: number[]; // TMDB genre IDs
   createdAt: string;
   updatedAt: string;
 }
@@ -288,14 +286,10 @@ export interface CollectionStats {
 // Form validation types
 export interface ProfileFormData {
   name: string;
-  age: string; // String for form input, converted to number
-  preferredGenres: number[];
 }
 
 export interface ProfileValidationErrors {
   name?: string;
-  age?: string;
-  preferredGenres?: string;
 }
 
 // Storage operation types
@@ -359,8 +353,6 @@ export const isUserProfile = (obj: any): obj is UserProfile => {
   return obj && 
     typeof obj.id === 'string' &&
     typeof obj.name === 'string' &&
-    typeof obj.age === 'number' &&
-    Array.isArray(obj.preferredGenres) &&
     typeof obj.createdAt === 'string' &&
     typeof obj.updatedAt === 'string';
 };
@@ -402,8 +394,6 @@ export type CollectionItemUpdate = PartialUpdate<Pick<CollectionItem, 'status' |
 
 // Constants for data validation
 export const VALIDATION_CONSTANTS = {
-  MIN_AGE: 1,
-  MAX_AGE: 120,
   MIN_NAME_LENGTH: 1,
   MAX_NAME_LENGTH: 50,
   MIN_RATING: 1,

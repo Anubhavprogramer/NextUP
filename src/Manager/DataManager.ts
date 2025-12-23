@@ -198,17 +198,11 @@ export class DataManager implements CollectionOperations {
   /**
    * Create new user profile
    */
-  async createUserProfile(
-    name: string,
-    age: number,
-    preferredGenres: number[]
-  ): Promise<UserProfile> {
+  async createUserProfile(name: string): Promise<UserProfile> {
     const now = new Date().toISOString();
     const profile: UserProfile = {
       id: generateId(),
       name: name.trim(),
-      age,
-      preferredGenres,
       createdAt: now,
       updatedAt: now,
     };
@@ -595,14 +589,6 @@ export class DataManager implements CollectionOperations {
 
     if (profile.name && profile.name.length > VALIDATION_CONSTANTS.MAX_NAME_LENGTH) {
       errors.push(`Name cannot exceed ${VALIDATION_CONSTANTS.MAX_NAME_LENGTH} characters`);
-    }
-
-    if (!profile.age || profile.age < VALIDATION_CONSTANTS.MIN_AGE || profile.age > VALIDATION_CONSTANTS.MAX_AGE) {
-      errors.push(`Age must be between ${VALIDATION_CONSTANTS.MIN_AGE} and ${VALIDATION_CONSTANTS.MAX_AGE}`);
-    }
-
-    if (!profile.preferredGenres || profile.preferredGenres.length === 0) {
-      errors.push('At least one preferred genre is required');
     }
 
     if (!profile.id || !profile.createdAt || !profile.updatedAt) {

@@ -13,7 +13,6 @@ import {
   ThemedInput,
   ThemedButton,
 } from '../Components/Themed';
-import { GenreSelector } from '../Components/Regular/GenreSelector';
 import { useTheme } from '../Store/ThemeContext';
 import { useToast } from '../Store/ToastContext';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
@@ -32,8 +31,6 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
   const { showError } = useToast();
   const [formData, setFormData] = useState<ProfileFormData>({
     name: '',
-    age: '',
-    preferredGenres: [],
   });
   const [errors, setErrors] = useState<ProfileValidationErrors>({});
   const [loading, setLoading] = useState(false);
@@ -50,21 +47,6 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
       newErrors.name = 'Name cannot exceed 50 characters';
     }
 
-    // Validate age
-    const ageNum = parseInt(formData.age, 10);
-    if (!formData.age.trim()) {
-      newErrors.age = 'Age is required';
-    } else if (isNaN(ageNum)) {
-      newErrors.age = 'Age must be a valid number';
-    } else if (ageNum < 1 || ageNum > 120) {
-      newErrors.age = 'Age must be between 1 and 120';
-    }
-
-    // Validate genres
-    if (formData.preferredGenres.length === 0) {
-      newErrors.preferredGenres = 'Please select at least one genre';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -76,14 +58,8 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
 
     setLoading(true);
     try {
-      const ageNum = parseInt(formData.age, 10);
-      
       // Create user profile
-      await dataManager.createUserProfile(
-        formData.name.trim(),
-        ageNum,
-        formData.preferredGenres
-      );
+      await dataManager.createUserProfile(formData.name.trim());
 
       // Mark first launch as complete
       await dataManager.completeFirstLaunch();
@@ -126,7 +102,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
                 Welcome to NextUP
               </ThemedText>
               <ThemedText variant="body" style={styles.subtitle}>
-                Let's set up your profile to get personalized recommendations
+                Let's set up your profile to get started with tracking your favorite movies and TV shows
               </ThemedText>
             </View>
 
@@ -142,24 +118,6 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
                 autoCapitalize="words"
                 autoCorrect={false}
                 maxLength={50}
-              />
-
-              {/* Age Input */}
-              <ThemedInput
-                label="Age"
-                placeholder="Enter your age"
-                value={formData.age}
-                onChangeText={(text) => updateFormData('age', text)}
-                error={errors.age}
-                keyboardType="numeric"
-                maxLength={3}
-              />
-
-              {/* Genre Selection */}
-              <GenreSelector
-                selectedGenres={formData.preferredGenres}
-                onGenresChange={(genres) => updateFormData('preferredGenres', genres)}
-                error={errors.preferredGenres}
               />
             </View>
 

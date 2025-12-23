@@ -174,8 +174,6 @@ export const debounce = <T extends (...args: any[]) => any>(
  */
 export const validateUserProfile = (profile: {
   name?: string;
-  age?: number;
-  preferredGenres?: number[];
 }): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
   
@@ -185,14 +183,6 @@ export const validateUserProfile = (profile: {
   
   if (profile.name && profile.name.length > VALIDATION_CONSTANTS.MAX_NAME_LENGTH) {
     errors.push(`Name cannot exceed ${VALIDATION_CONSTANTS.MAX_NAME_LENGTH} characters`);
-  }
-  
-  if (!profile.age || profile.age < VALIDATION_CONSTANTS.MIN_AGE || profile.age > VALIDATION_CONSTANTS.MAX_AGE) {
-    errors.push(`Age must be between ${VALIDATION_CONSTANTS.MIN_AGE} and ${VALIDATION_CONSTANTS.MAX_AGE}`);
-  }
-  
-  if (!profile.preferredGenres || profile.preferredGenres.length === 0) {
-    errors.push('At least one preferred genre is required');
   }
   
   return {

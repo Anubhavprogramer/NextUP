@@ -70,7 +70,7 @@ export const LIGHT_THEME = {
     secondaryDark: '#3F3EA3',
     
     // Background colors
-    background: '#FFFFFF',
+    background: '#FADCC2',
     backgroundSecondary: '#F2F2F7',
     backgroundTertiary: '#FFFFFF',
     
@@ -79,7 +79,7 @@ export const LIGHT_THEME = {
     surfaceSecondary: '#F2F2F7',
     
     // Text colors
-    text: '#000000',
+    text: '#BC6C25',
     textSecondary: '#3C3C43',
     textTertiary: '#8E8E93',
     textInverse: '#FFFFFF',
@@ -140,7 +140,7 @@ export const DARK_THEME = {
     secondaryDark: '#3F3EA3',
     
     // Background colors
-    background: '#000000',
+    background: '#FADCC2',
     backgroundSecondary: '#1C1C1E',
     backgroundTertiary: '#2C2C2E',
     
@@ -149,7 +149,7 @@ export const DARK_THEME = {
     surfaceSecondary: '#2C2C2E',
     
     // Text colors
-    text: '#FFFFFF',
+    text: '#BC6C25',
     textSecondary: '#EBEBF5',
     textTertiary: '#8E8E93',
     textInverse: '#000000',
