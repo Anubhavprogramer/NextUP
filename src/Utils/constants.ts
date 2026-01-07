@@ -60,9 +60,9 @@ export const DESIGN_CONSTANTS = {
 export const LIGHT_THEME = {
   colors: {
     // Primary colors
-    primary: '#007AFF',
-    primaryLight: '#4DA2FF',
-    primaryDark: '#0056CC',
+    primary: '#d06818ff',
+    primaryLight: '#743700',
+    primaryDark: '#cc5200ff',
     
     // Secondary colors
     secondary: '#5856D6',

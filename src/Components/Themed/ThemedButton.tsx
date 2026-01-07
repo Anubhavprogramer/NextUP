@@ -32,14 +32,14 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
   const getButtonStyle = () => {
     const baseStyle = [styles.button];
     
-    if (fullWidth) {
-      baseStyle.push(styles.fullWidth);
-    }
+    // if (fullWidth) {
+    //   baseStyle.push(styles.fullWidth);
+    // }
 
     const variantStyle: any = {};
     switch (variant) {
       case 'primary':
-        variantStyle.backgroundColor = disabled ? theme.colors.textTertiary : theme.colors.primary;
+        variantStyle.backgroundColor = disabled ? theme.colors.textTertiary : theme.colors.primaryLight;
         break;
       case 'secondary':
         variantStyle.backgroundColor = disabled ? theme.colors.textTertiary : theme.colors.secondary;
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   button: {
     height: DESIGN_CONSTANTS.BUTTON_HEIGHT,
     paddingHorizontal: DESIGN_CONSTANTS.SPACING.large,
-    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
+    borderRadius: 999,
     justifyContent: 'center',
     alignItems: 'center',
     minWidth: DESIGN_CONSTANTS.MIN_TOUCH_TARGET,

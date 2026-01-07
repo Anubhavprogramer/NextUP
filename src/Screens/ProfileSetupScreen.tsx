@@ -5,6 +5,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -96,13 +97,15 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
           keyboardShouldPersistTaps="handled"
         >
           <ThemedView style={styles.content}>
-            {/* Header */}
-            <View style={styles.header}>
-              <ThemedText variant="title" style={styles.title}>
-                Welcome to NextUP
-              </ThemedText>
-              <ThemedText variant="body" style={styles.subtitle}>
-                Let's set up your profile to get started with tracking your favorite movies and TV shows
+          {/* Header */}
+          <View style={styles.header}>
+            <Image
+              source={require('../../assets/app-icon.png')}
+              style={styles.image}
+              resizeMode="contain"
+            />
+              <ThemedText variant="body" style={[styles.subtitle, { color: theme.colors.text }]}>
+                Bring all your lost-in-the-stream shows and half-watched movies into one place. Your entire Watchlist, finally in one app!
               </ThemedText>
             </View>
 
@@ -122,7 +125,7 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
             </View>
 
             {/* Submit Button */}
-            <View style={styles.buttonContainer}>
+            <View style={[styles.buttonContainer, { backgroundColor: theme.colors.primaryLight, borderRadius: 999}]}>
               <ThemedButton
                 title="Create Profile"
                 onPress={handleSubmit}
@@ -158,6 +161,13 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
+  image: {
+    width: 231,
+    height: 231,
+    marginBottom: DESIGN_CONSTANTS.SPACING.large,
+    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.large,
+    paddingTop: DESIGN_CONSTANTS.SPACING.large
+  },
   content: {
     flex: 1,
     paddingHorizontal: DESIGN_CONSTANTS.CONTAINER_PADDING,
@@ -173,7 +183,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: 'center',
-    opacity: 0.8,
     lineHeight: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body * 1.5,
   },
   form: {
