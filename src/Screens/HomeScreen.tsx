@@ -174,7 +174,7 @@ export const HomeScreen: React.FC = () => {
         {/* Header with search button */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <ThemedText variant="homeTitle" style={styles.welcomeText}>
+            <ThemedText variant="homeTitle" style={[styles.welcomeText, { color: '#000000' }]}>
               Hi, {userProfile?.name}!
             </ThemedText>
             <ThemedText variant="body" style={styles.subtitle}>
