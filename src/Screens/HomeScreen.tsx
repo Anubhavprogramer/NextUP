@@ -165,7 +165,7 @@ export const HomeScreen: React.FC = () => {
             style={styles.searchButton}
             onPress={() => navigation.navigate('Search')}
           >
-            <Icon name="search" size={24} color={theme.colors.textSecondary} />
+            <Icon name="search" size={24} color={theme.colors.primaryDark} />
           </TouchableOpacity>
         </View>
 
