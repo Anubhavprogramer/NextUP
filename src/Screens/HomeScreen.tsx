@@ -83,6 +83,7 @@ export const HomeScreen: React.FC = () => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: theme.colors.background,
     },
     header: {
       flexDirection: 'row',
@@ -173,7 +174,7 @@ export const HomeScreen: React.FC = () => {
         {/* Header with search button */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <ThemedText variant="title" style={styles.welcomeText}>
+            <ThemedText variant="homeTitle" style={styles.welcomeText}>
               Hi, {userProfile?.name}!
             </ThemedText>
             <ThemedText variant="body" style={styles.subtitle}>

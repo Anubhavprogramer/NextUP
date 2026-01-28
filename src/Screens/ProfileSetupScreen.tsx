@@ -134,13 +134,6 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
                 fullWidth
               />
             </View>
-
-            {/* Footer */}
-            <View style={styles.footer}>
-              <ThemedText variant="caption" style={styles.footerText}>
-                Your data is stored locally on your device and never shared with third parties.
-              </ThemedText>
-            </View>
           </ThemedView>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -184,10 +177,12 @@ const styles = StyleSheet.create({
   subtitle: {
     textAlign: 'center',
     lineHeight: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body * 1.5,
+    paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
   },
   form: {
     flex: 1,
     marginBottom: DESIGN_CONSTANTS.SPACING.large,
+    paddingHorizontal: DESIGN_CONSTANTS.SPACING.small,
   },
   buttonContainer: {
     marginBottom: DESIGN_CONSTANTS.SPACING.large,
