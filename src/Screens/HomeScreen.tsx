@@ -8,6 +8,7 @@ import { ThemedView } from '../Components/Themed/ThemedView';
 import { ThemedText } from '../Components/Themed/ThemedText';
 import { ThemedCard } from '../Components/Themed/ThemedCard';
 import { CollectionSection } from '../Components/Regular/CollectionSection';
+import { EmptyState } from '../Components/Regular/EmptyState';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
@@ -106,7 +107,6 @@ export const HomeScreen: React.FC = () => {
     searchButton: {
       padding: DESIGN_CONSTANTS.SPACING.small,
       borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
-      backgroundColor: theme.colors.surface,
     },
     content: {
       flex: 1,
@@ -139,27 +139,6 @@ export const HomeScreen: React.FC = () => {
       color: theme.colors.textSecondary,
       textAlign: 'center',
     },
-    emptyState: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: DESIGN_CONSTANTS.SPACING.large,
-    },
-    emptyText: {
-      textAlign: 'center',
-      color: theme.colors.textSecondary,
-      marginBottom: DESIGN_CONSTANTS.SPACING.large,
-    },
-    emptyButton: {
-      paddingHorizontal: DESIGN_CONSTANTS.SPACING.large,
-      paddingVertical: DESIGN_CONSTANTS.SPACING.medium,
-      backgroundColor: theme.colors.primary,
-      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
-    },
-    emptyButtonText: {
-      color: theme.colors.background,
-      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.semibold,
-    },
   });
 
   const watchedItems = getCollectionByStatus('watched');
@@ -174,7 +153,7 @@ export const HomeScreen: React.FC = () => {
         {/* Header with search button */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <ThemedText variant="homeTitle" style={[styles.welcomeText, { color: '#000000' }]}>
+            <ThemedText variant="homeTitle" style={[styles.welcomeText, { color: theme.colors.text }]}>
               Hi, {userProfile?.name}!
             </ThemedText>
             <ThemedText variant="body" style={styles.subtitle}>
@@ -186,7 +165,7 @@ export const HomeScreen: React.FC = () => {
             style={styles.searchButton}
             onPress={() => navigation.navigate('Search')}
           >
-            <Icon name="search" size={24} color={theme.colors.primary} />
+            <Icon name="search" size={24} color={theme.colors.textSecondary} />
           </TouchableOpacity>
         </View>
 
@@ -267,18 +246,16 @@ export const HomeScreen: React.FC = () => {
             </>
           ) : (
             /* Empty State */
-            <View style={styles.emptyState}>
-              <ThemedText variant="body" style={styles.emptyText}>
-                Your collection is empty.{'\n'}Start by searching for movies and TV shows to add to your collection.
-              </ThemedText>
-              <TouchableOpacity
-                style={styles.emptyButton}
-                onPress={() => navigation.navigate('Search')}
-              >
-                <ThemedText style={styles.emptyButtonText}>
-                  Search Movies & TV Shows
-                </ThemedText>
-              </TouchableOpacity>
+            <View style={{
+              height: 700,
+            }}>
+              <EmptyState
+                icon="bookmark-outline"
+                title="Your Collection is Empty"
+                message="Start by searching for movies and TV shows to add to your collection."
+                buttonText="Search Movies & TV Shows"
+                onButtonPress={() => navigation.navigate('Search')}
+              />
             </View>
           )}
         </ScrollView>
