@@ -76,10 +76,10 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       letterSpacing: 1,
     },
     overview: {
-      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body,
+      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption,
       color: theme.colors.white,
-      lineHeight: 22,
-      marginBottom: DESIGN_CONSTANTS.SPACING.medium,
+      // lineHeight: 22,
+      // marginBottom: DESIGN_CONSTANTS.SPACING.medium,
       flex: 1,
     },
     metadata: {
@@ -158,6 +158,26 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       transform: [{ translateY: -20 }],
       zIndex: 1,
     },
+    topTriangle: {
+      position: 'absolute',
+      top: -20,
+      left: '35%',
+      width: 25,
+      height: 25,
+      backgroundColor: theme.colors.background,
+      transform: [{ translateX: -15 }, { rotate: '45deg' }],
+      zIndex: 1,
+    },
+    bottomTriangle: {
+      position: 'absolute',
+      bottom: -20,
+      left: '35%',
+      width: 25,
+      height: 25,
+      backgroundColor: theme.colors.background,
+      transform: [{ translateX: -15 }, { rotate: '45deg' }],
+      zIndex: 1,
+    },
   });
 
   // Generate barcode pattern
@@ -180,8 +200,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     : null;
 
   const truncatedOverview =
-    mediaItem.overview.length > 120
-      ? `${mediaItem.overview.substring(0, 120)}...`
+    mediaItem.overview.length > 800
+      ? `${mediaItem.overview.substring(0, 800)}...`
       : mediaItem.overview;
 
   return (
@@ -193,6 +213,9 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     >
       <View style={styles.leftCircle}></View>
       <View style={styles.rightCircle}></View>
+
+      <View style={styles.topTriangle}></View>
+      <View style={styles.bottomTriangle}></View>
       {/* Left Poster Section */}
       <View style={styles.posterSection}>
         {posterUrl ? (
@@ -214,14 +237,16 @@ export const MediaCard: React.FC<MediaCardProps> = ({
 
       {/* Middle Content Section */}
       <View style={styles.middleSection}>
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.title} numberOfLines={0}>
             {mediaItem.title}
           </Text>
 
+
+
           {truncatedOverview ? (
-            <Text style={styles.overview} numberOfLines={3}>
-              {mediaItem.overview}
+            <Text style={styles.overview} numberOfLines={6}>
+              {truncatedOverview}
             </Text>
           ) : null}
         </View>
