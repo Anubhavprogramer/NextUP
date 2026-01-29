@@ -13,6 +13,7 @@ import { useToast } from '../Store/ToastContext';
 import { RootStackParamList, CollectionStatus } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { formatReleaseDate, getTMDBImageUrl } from '../Utils/helpers';
+import { CustomHeader } from '../Components';
 
 type MediaDetailScreenRouteProp = RouteProp<RootStackParamList, 'MediaDetail'>;
 type MediaDetailScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'MediaDetail'>;
@@ -161,6 +162,7 @@ export const MediaDetailScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
+      
       <ThemedView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Poster Section */}

@@ -11,6 +11,7 @@ import { CustomHeader } from '../Components/Regular/CustomHeader';
 import { MediaItem, APIError } from '../Types';
 import { searchMulti, testTMDBConnection } from '../API/tmdb';
 import { runFullDebug } from '../API/debug';
+import { DESIGN_CONSTANTS } from '../Utils';
 
 export const SearchScreen: React.FC = () => {
   const { theme } = useTheme();
@@ -137,6 +138,8 @@ export const SearchScreen: React.FC = () => {
     },
     content: {
       flex: 1,
+      paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
+      paddingVertical: DESIGN_CONSTANTS.SPACING.small,
     },
   });
 
