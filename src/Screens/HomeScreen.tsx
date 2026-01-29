@@ -16,6 +16,7 @@ import { ThemedText } from '../Components/Themed/ThemedText';
 import { ThemedCard } from '../Components/Themed/ThemedCard';
 import { CollectionSection } from '../Components/Regular/CollectionSection';
 import { EmptyState } from '../Components/Regular/EmptyState';
+import { StatCard } from '../Components/Regular/StatCard';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
@@ -113,9 +114,6 @@ export const HomeScreen: React.FC = () => {
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
-      paddingVertical: DESIGN_CONSTANTS.SPACING.medium,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
     },
     headerLeft: {
       flex: 1,
@@ -139,27 +137,12 @@ export const HomeScreen: React.FC = () => {
     },
     sectionTitle: {
       marginBottom: DESIGN_CONSTANTS.SPACING.medium,
+      color: theme.colors.primaryDark,
     },
     statsGrid: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       gap: DESIGN_CONSTANTS.SPACING.small,
-    },
-    statCard: {
-      flex: 1,
-      padding: DESIGN_CONSTANTS.SPACING.medium,
-    },
-    statContent: {
-      alignItems: 'center',
-    },
-    statNumber: {
-      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.heading,
-      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.bold,
-      marginVertical: DESIGN_CONSTANTS.SPACING.small,
-    },
-    statLabel: {
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
     },
   });
 
@@ -214,53 +197,26 @@ export const HomeScreen: React.FC = () => {
               </ThemedText>
 
               <View style={styles.statsGrid}>
-                <ThemedCard style={styles.statCard}>
-                  <View style={styles.statContent}>
-                    <Icon
-                      name="checkmark-circle"
-                      size={24}
-                      color={theme.colors.success}
-                    />
-                    <ThemedText variant="body" style={styles.statNumber}>
-                      {stats.watched}
-                    </ThemedText>
-                    <ThemedText variant="caption" style={styles.statLabel}>
-                      Watched
-                    </ThemedText>
-                  </View>
-                </ThemedCard>
+                <StatCard
+                  iconName="checkmark-circle"
+                  iconColor={theme.colors.success}
+                  number={stats.watched}
+                  label="Watched"
+                />
 
-                <ThemedCard style={styles.statCard}>
-                  <View style={styles.statContent}>
-                    <Icon
-                      name="play-circle"
-                      size={24}
-                      color={theme.colors.primary}
-                    />
-                    <ThemedText variant="body" style={styles.statNumber}>
-                      {stats.watching}
-                    </ThemedText>
-                    <ThemedText variant="caption" style={styles.statLabel}>
-                      Watching
-                    </ThemedText>
-                  </View>
-                </ThemedCard>
+                <StatCard
+                  iconName="play-circle"
+                  iconColor={theme.colors.primary}
+                  number={stats.watching}
+                  label="Watching"
+                />
 
-                <ThemedCard style={styles.statCard}>
-                  <View style={styles.statContent}>
-                    <Icon
-                      name="bookmark"
-                      size={24}
-                      color={theme.colors.warning}
-                    />
-                    <ThemedText variant="body" style={styles.statNumber}>
-                      {stats.willWatch}
-                    </ThemedText>
-                    <ThemedText variant="caption" style={styles.statLabel}>
-                      Wishlist
-                    </ThemedText>
-                  </View>
-                </ThemedCard>
+                <StatCard
+                  iconName="bookmark"
+                  iconColor={theme.colors.warning}
+                  number={stats.willWatch}
+                  label="Wishlist"
+                />
               </View>
             </View>
           )}
