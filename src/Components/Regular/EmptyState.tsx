@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemedText } from '../Themed/ThemedText';
 import { useTheme } from '../../Store/ThemeContext';
@@ -56,16 +56,16 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <Icon name={icon} size={64} color={theme.colors.textSecondary} />
+        <Icon name={icon} size={64} color={theme.colors.primaryDark} />
       </View>
 
       {title && (
-        <ThemedText variant="subtitle" style={styles.title}>
+        <ThemedText variant="subtitle" style={[styles.title, { color: theme.colors.primaryDark }]}>
           {title}
         </ThemedText>
       )}
 
-      <ThemedText variant="body" style={styles.message}>
+      <ThemedText variant="body" style={[styles.message, { color: theme.colors.primaryDark }]}>
         {message}
       </ThemedText>
 

@@ -1,10 +1,10 @@
 import React from 'react';
-import { FlatList, View, Text, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { FlatList, View, Text, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'react-native';
 import { useTheme } from '../../Store/ThemeContext';
 import { MediaListProps, MediaItem } from '../../Types';
 import { MediaCard } from './MediaCard';
 import { DESIGN_CONSTANTS } from '../../Utils/constants';
+import { Images } from '../../Utils/Imges';
 
 export const MediaList: React.FC<MediaListProps> = ({
   data,
@@ -24,7 +24,11 @@ export const MediaList: React.FC<MediaListProps> = ({
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Icon name="search-outline" size={64} color={theme.colors.primaryDark} />
+      <Image
+        source={Images.search}
+        style={{ width: 64, height: 64, tintColor: theme.colors.primaryDark }}
+        resizeMode="contain"
+      />
       <Text style={styles.emptyTitle}>No Results</Text>
       <Text style={styles.emptyMessage}>{emptyMessage}</Text>
     </View>

@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  Image,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,16 +22,28 @@ import { useToast } from '../Store/ToastContext';
 import { RootStackParamList, CollectionItem, CollectionStatus } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { calculateCollectionStats } from '../Utils/helpers';
+import { Images } from '../Utils/Imges';
 
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Main'>;
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Main'
+>;
 
 export const HomeScreen: React.FC = () => {
   const { theme } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { userProfile, appState, getCollectionByStatus, updateItemStatus, removeFromCollection } = useApp();
+  const {
+    userProfile,
+    appState,
+    getCollectionByStatus,
+    updateItemStatus,
+    removeFromCollection,
+  } = useApp();
   const { showSuccess, showError } = useToast();
 
-  const stats = appState?.collections ? calculateCollectionStats(appState.collections) : null;
+  const stats = appState?.collections
+    ? calculateCollectionStats(appState.collections)
+    : null;
 
   const handleItemPress = (item: CollectionItem) => {
     navigation.navigate('MediaDetail', { mediaItem: item.mediaItem });
@@ -52,11 +71,14 @@ export const HomeScreen: React.FC = () => {
           style: 'destructive',
           onPress: () => handleRemoveItem(item),
         },
-      ]
+      ],
     );
   };
 
-  const handleStatusChange = async (item: CollectionItem, newStatus: CollectionStatus) => {
+  const handleStatusChange = async (
+    item: CollectionItem,
+    newStatus: CollectionStatus,
+  ) => {
     try {
       await updateItemStatus(item.id, newStatus);
       const statusLabel = newStatus.replace('_', ' ');
@@ -145,7 +167,10 @@ export const HomeScreen: React.FC = () => {
   const watchingItems = getCollectionByStatus('watching');
   const willWatchItems = getCollectionByStatus('will_watch');
 
-  const hasAnyItems = watchedItems.length > 0 || watchingItems.length > 0 || willWatchItems.length > 0;
+  const hasAnyItems =
+    watchedItems.length > 0 ||
+    watchingItems.length > 0 ||
+    willWatchItems.length > 0;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -153,19 +178,30 @@ export const HomeScreen: React.FC = () => {
         {/* Header with search button */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <ThemedText variant="homeTitle" style={[styles.welcomeText, { color: theme.colors.text }]}>
+            <ThemedText
+              variant="homeTitle"
+              style={[styles.welcomeText, { color: theme.colors.primaryDark }]}
+            >
               Hi, {userProfile?.name}!
             </ThemedText>
-            <ThemedText variant="body" style={styles.subtitle}>
+            <ThemedText variant="body" style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
               Track your favorite movies and TV shows
             </ThemedText>
           </View>
-          
+
           <TouchableOpacity
             style={styles.searchButton}
             onPress={() => navigation.navigate('Search')}
           >
-            <Icon name="search" size={34} color={theme.colors.primaryDark} />
+            <Image
+              source={Images.search}
+              style={{
+                width: 34,
+                height: 34,
+                tintColor: theme.colors.primaryDark,
+              }}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         </View>
 
@@ -176,11 +212,15 @@ export const HomeScreen: React.FC = () => {
               <ThemedText variant="subtitle" style={styles.sectionTitle}>
                 Your Collection
               </ThemedText>
-              
+
               <View style={styles.statsGrid}>
                 <ThemedCard style={styles.statCard}>
                   <View style={styles.statContent}>
-                    <Icon name="checkmark-circle" size={24} color={theme.colors.success} />
+                    <Icon
+                      name="checkmark-circle"
+                      size={24}
+                      color={theme.colors.success}
+                    />
                     <ThemedText variant="body" style={styles.statNumber}>
                       {stats.watched}
                     </ThemedText>
@@ -192,7 +232,11 @@ export const HomeScreen: React.FC = () => {
 
                 <ThemedCard style={styles.statCard}>
                   <View style={styles.statContent}>
-                    <Icon name="play-circle" size={24} color={theme.colors.primary} />
+                    <Icon
+                      name="play-circle"
+                      size={24}
+                      color={theme.colors.primary}
+                    />
                     <ThemedText variant="body" style={styles.statNumber}>
                       {stats.watching}
                     </ThemedText>
@@ -204,7 +248,11 @@ export const HomeScreen: React.FC = () => {
 
                 <ThemedCard style={styles.statCard}>
                   <View style={styles.statContent}>
-                    <Icon name="bookmark" size={24} color={theme.colors.warning} />
+                    <Icon
+                      name="bookmark"
+                      size={24}
+                      color={theme.colors.warning}
+                    />
                     <ThemedText variant="body" style={styles.statNumber}>
                       {stats.willWatch}
                     </ThemedText>
@@ -227,7 +275,7 @@ export const HomeScreen: React.FC = () => {
                 onItemLongPress={handleItemLongPress}
                 onSeeAll={() => handleSeeAll('watching')}
               />
-              
+
               <CollectionSection
                 title="Want to Watch"
                 items={willWatchItems}
@@ -235,7 +283,7 @@ export const HomeScreen: React.FC = () => {
                 onItemLongPress={handleItemLongPress}
                 onSeeAll={() => handleSeeAll('will_watch')}
               />
-              
+
               <CollectionSection
                 title="Watched"
                 items={watchedItems}
@@ -246,9 +294,11 @@ export const HomeScreen: React.FC = () => {
             </>
           ) : (
             /* Empty State */
-            <View style={{
-              height: 700,
-            }}>
+            <View
+              style={{
+                height: 700,
+              }}
+            >
               <EmptyState
                 icon="bookmark-outline"
                 title="Your Collection is Empty"

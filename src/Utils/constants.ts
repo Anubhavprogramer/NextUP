@@ -80,7 +80,7 @@ export const LIGHT_THEME = {
     
     // Text colors
     text: '#BC6C25',
-    textSecondary: '#3C3C43',
+    textSecondary: '#000000ff',
     textTertiary: '#8E8E93',
     textInverse: '#FFFFFF',
     
