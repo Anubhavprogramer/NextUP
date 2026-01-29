@@ -115,6 +115,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     barcodeSection: {
       width: 50,
       backgroundColor: theme.colors.primaryDark,
+      paddingHorizontal: DESIGN_CONSTANTS.SPACING.xsmall,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -134,6 +135,28 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       width: 30,
       height: 1,
       backgroundColor: theme.colors.white,
+    },
+    leftCircle: {
+      position: 'absolute',
+      left: -20,
+      top: '50%',
+      width: 30,
+      height: 30,
+      borderRadius: 20,
+      backgroundColor: theme.colors.background,
+      transform: [{ translateY: -20 }],
+      zIndex: 1,
+    },
+    rightCircle: {
+      position: 'absolute',
+      right: -20,
+      top: '50%',
+      width: 30,
+      height: 30,
+      borderRadius: 20,
+      backgroundColor: theme.colors.background,
+      transform: [{ translateY: -20 }],
+      zIndex: 1,
     },
   });
 
@@ -168,6 +191,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       onLongPress={onLongPress}
       activeOpacity={0.7}
     >
+      <View style={styles.leftCircle}></View>
+      <View style={styles.rightCircle}></View>
       {/* Left Poster Section */}
       <View style={styles.posterSection}>
         {posterUrl ? (
