@@ -61,8 +61,8 @@ export const LIGHT_THEME = {
   colors: {
     // Primary colors
     primary: '#d06818ff',
-    primaryLight: '#743700',
-    primaryDark: '#cc5200ff',
+    primaryDark: '#743700',
+    primaryLight: '#cc5200ff',
     
     // Secondary colors
     secondary: '#5856D6',
