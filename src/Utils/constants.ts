@@ -93,6 +93,7 @@ export const LIGHT_THEME = {
     warning: '#FF9500',
     error: '#FF3B30',
     info: '#007AFF',
+    white: '#FFFFFF',
     
     // Overlay
     overlay: 'rgba(0, 0, 0, 0.4)',
@@ -163,7 +164,8 @@ export const DARK_THEME = {
     warning: '#C47A2C',   // Clay orange
     error: '#9E3B2F',     // Muted maroon
     info: '#8B6F4E',      // Warm neutral info
-
+    white: '#FFFFFF',
+    
     // Overlay
     overlay: 'rgba(0, 0, 0, 0.65)',
 

@@ -48,7 +48,7 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
     },
     itemContainer: {
       marginRight: DESIGN_CONSTANTS.SPACING.medium,
-      width: Dimensions.get('window').width * 0.8, // Fixed width for consistent layout
+      width: Dimensions.get('window').width * 0.9, // Fixed width for consistent layout
     },
     emptyContainer: {
       paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
@@ -101,8 +101,8 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
               mediaItem={item.mediaItem}
               onPress={() => onItemPress?.(item)}
               onLongPress={() => onItemLongPress?.(item)}
-              showStatus={false}
-              collectionStatus={item.status}
+              // showStatus={false}
+              // collectionStatus={item.status}
             />
           </View>
         ))}
