@@ -24,7 +24,7 @@ export const MediaList: React.FC<MediaListProps> = ({
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Icon name="search-outline" size={64} color={theme.colors.textSecondary} />
+      <Icon name="search-outline" size={64} color={theme.colors.primaryDark} />
       <Text style={styles.emptyTitle}>No Results</Text>
       <Text style={styles.emptyMessage}>{emptyMessage}</Text>
     </View>
@@ -32,7 +32,7 @@ export const MediaList: React.FC<MediaListProps> = ({
 
   const renderLoadingState = () => (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color={theme.colors.primary} />
+      <ActivityIndicator size="large" color={theme.colors.primaryDark} />
       <Text style={styles.loadingText}>Searching...</Text>
     </View>
   );
@@ -51,13 +51,13 @@ export const MediaList: React.FC<MediaListProps> = ({
     emptyTitle: {
       fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.title,
       fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.semibold,
-      color: theme.colors.text,
+      color: theme.colors.primaryDark,
       marginTop: DESIGN_CONSTANTS.SPACING.medium,
       marginBottom: DESIGN_CONSTANTS.SPACING.small,
     },
     emptyMessage: {
       fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body,
-      color: theme.colors.textSecondary,
+      color: theme.colors.primaryDark,
       textAlign: 'center',
       lineHeight: 22,
     },

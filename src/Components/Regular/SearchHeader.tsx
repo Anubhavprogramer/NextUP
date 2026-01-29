@@ -47,12 +47,12 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.background,
-    paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
+    paddingHorizontal: DESIGN_CONSTANTS.SPACING.small,
     // paddingVertical: DESIGN_CONSTANTS.SPACING.small,
   },
 
   backButton: {
-    // paddingRight: DESIGN_CONSTANTS.SPACING.small,
+    paddingRight: DESIGN_CONSTANTS.SPACING.small,
   },
 
   searchContainer: {
@@ -64,6 +64,7 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
     paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
     borderWidth: 1.5,
     borderColor: theme.colors.primaryDark,
+    height: 45,
   },
 
   searchIcon: {
