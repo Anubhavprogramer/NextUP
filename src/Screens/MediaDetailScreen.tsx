@@ -114,13 +114,13 @@ export const MediaDetailScreen: React.FC = () => {
     },
     poster: {
       width: '100%',
-      height: '100%',
+      aspectRatio: 2 / 3,
       borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.large,
       marginBottom: DESIGN_CONSTANTS.SPACING.medium,
     },
     posterPlaceholder: {
-      width: 200,
-      height: 300,
+      width: '100%',
+      aspectRatio: 2 / 3,
       borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
       backgroundColor: theme.colors.border,
       justifyContent: 'center',
@@ -350,8 +350,8 @@ export const MediaDetailScreen: React.FC = () => {
                     <TouchableOpacity
                       style={[
                         styles.statusButton,
-                        collectionItem.status === 'watched' &&
-                          styles.statusButtonActive,
+                        // collectionItem.status === 'watched' &&
+                        //   styles.statusButtonActive,
                       ]}
                       onPress={() => handleRemove()}
                     >

@@ -118,6 +118,11 @@ export const HomeScreen: React.FC = () => {
     headerLeft: {
       flex: 1,
     },
+    headerRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: DESIGN_CONSTANTS.SPACING.small,
+    },
     welcomeText: {
       marginBottom: DESIGN_CONSTANTS.SPACING.xsmall,
     },
@@ -125,6 +130,10 @@ export const HomeScreen: React.FC = () => {
       color: theme.colors.textSecondary,
     },
     searchButton: {
+      padding: DESIGN_CONSTANTS.SPACING.small,
+      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
+    },
+    statsButton: {
       padding: DESIGN_CONSTANTS.SPACING.small,
       borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
     },
@@ -172,20 +181,29 @@ export const HomeScreen: React.FC = () => {
             </ThemedText>
           </View>
 
-          <TouchableOpacity
-            style={styles.searchButton}
-            onPress={() => navigation.navigate('Search')}
-          >
-            <Image
-              source={Images.search}
-              style={{
-                width: 34,
-                height: 34,
-                tintColor: theme.colors.primaryDark,
-              }}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
+          <View style={styles.headerRight}>
+            <TouchableOpacity
+              style={styles.statsButton}
+              onPress={() => navigation.navigate('Statistics')}
+            >
+              <Icon name="bar-chart" size={20} color={theme.colors.primaryDark} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.searchButton}
+              onPress={() => navigation.navigate('Search')}
+            >
+              <Image
+                source={Images.search}
+                style={{
+                  width: 20,
+                  height: 20,
+                  tintColor: theme.colors.primaryDark,
+                }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
