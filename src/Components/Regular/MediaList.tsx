@@ -46,7 +46,6 @@ export const MediaList: React.FC<MediaListProps> = ({
       flex: 1,
     },
     emptyContainer: {
-      flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: DESIGN_CONSTANTS.SPACING.large,
