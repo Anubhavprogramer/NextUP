@@ -6,9 +6,12 @@ import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
 import { SearchBar } from '../Components/Regular/SearchBar';
 import { MediaList } from '../Components/Regular/MediaList';
+import { SearchHeader } from '../Components/Regular/SearchHeader';
+import { CustomHeader } from '../Components/Regular/CustomHeader';
 import { MediaItem, APIError } from '../Types';
 import { searchMulti, testTMDBConnection } from '../API/tmdb';
 import { runFullDebug } from '../API/debug';
+import { DESIGN_CONSTANTS } from '../Utils';
 
 export const SearchScreen: React.FC = () => {
   const { theme } = useTheme();
@@ -135,12 +138,14 @@ export const SearchScreen: React.FC = () => {
     },
     content: {
       flex: 1,
+      paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
+      paddingVertical: DESIGN_CONSTANTS.SPACING.small,
     },
   });
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <SearchBar
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
+      <SearchHeader
         onSearch={handleSearch}
         placeholder="Search movies and TV shows..."
         debounceMs={300}

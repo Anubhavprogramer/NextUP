@@ -3,7 +3,12 @@ import { Text, TextProps, StyleSheet } from 'react-native';
 import { useThemeColor } from '../../Store/ThemeContext';
 import { DESIGN_CONSTANTS } from '../../Utils/constants';
 
-export type TextVariant = 'title' | 'subtitle' | 'body' | 'caption';
+export type TextVariant =
+  | 'homeTitle'
+  | 'title'
+  | 'subtitle'
+  | 'body'
+  | 'caption';
 
 export interface ThemedTextProps extends TextProps {
   lightColor?: string;
@@ -18,23 +23,11 @@ export const ThemedText: React.FC<ThemedTextProps> = ({
   variant = 'body',
   ...otherProps
 }) => {
-  const color = useThemeColor(
-    { light: lightColor, dark: darkColor },
-    'text'
-  );
+  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
   const variantStyle = styles[variant];
 
-  return (
-    <Text
-      style={[
-        { color },
-        variantStyle,
-        style,
-      ]}
-      {...otherProps}
-    />
-  );
+  return <Text style={[{ color }, variantStyle, style]} {...otherProps} />;
 };
 
 const styles = StyleSheet.create({
@@ -42,6 +35,12 @@ const styles = StyleSheet.create({
     fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.largeTitle,
     fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.bold,
     lineHeight: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.largeTitle * 1.2,
+  },
+  homeTitle: {
+    fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.largeTitle + 6,
+    fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.bold,
+    lineHeight: (DESIGN_CONSTANTS.TYPOGRAPHY.sizes.largeTitle + 6) * 1.15,
+    letterSpacing: -0.5, // premium iOS feel
   },
   subtitle: {
     fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.title,

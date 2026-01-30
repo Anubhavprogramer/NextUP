@@ -8,10 +8,13 @@ import { ThemedView } from '../Components/Themed/ThemedView';
 import { ThemedText } from '../Components/Themed/ThemedText';
 import { SearchBar } from '../Components/Regular/SearchBar';
 import { MediaList } from '../Components/Regular/MediaList';
+import { CustomHeader } from '../Components/Regular/CustomHeader';
+import { SearchHeader } from '../Components/Regular/SearchHeader';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
 import { RootStackParamList, CollectionItem, CollectionStatus, MediaItem } from '../Types';
+import { DESIGN_CONSTANTS } from '../Utils/constants';
 
 type CollectionScreenRouteProp = RouteProp<RootStackParamList, 'Collection'>;
 type CollectionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Collection'>;
@@ -134,48 +137,47 @@ export const CollectionScreen: React.FC = () => {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      title: getTitle(status),
+      headerShown: false,
     });
-  }, [navigation, status]);
+  }, [navigation]);
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: theme.colors.background,
     },
     content: {
       flex: 1,
+      paddingHorizontal: DESIGN_CONSTANTS.SPACING.small,
     },
     searchContainer: {
-      // paddingHorizontal: 16,
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      // paddingHorizontal: DESIGN_CONSTANTS.SPACING.small,
+      paddingTop: DESIGN_CONSTANTS.SPACING.xxlarge + 5,
+      backgroundColor: theme.colors.background,
     },
     header: {
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
+      paddingVertical: DESIGN_CONSTANTS.SPACING.small,
+      backgroundColor: theme.colors.background,
     },
     subtitle: {
       color: theme.colors.textSecondary,
-      marginTop: 4,
+      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption,
     },
   });
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
+      
       <ThemedView style={styles.container}>
         {/* Search Bar - only show if there are items to search */}
-        {items.length > 0 && (
           <View style={styles.searchContainer}>
-            <SearchBar
+            <SearchHeader
               onSearch={handleSearch}
               placeholder={`Search in ${getTitle(status).toLowerCase()}...`}
               debounceMs={300}
             />
           </View>
-        )}
         
         {/* Results Header */}
         {items.length > 0 && (

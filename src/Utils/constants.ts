@@ -60,9 +60,9 @@ export const DESIGN_CONSTANTS = {
 export const LIGHT_THEME = {
   colors: {
     // Primary colors
-    primary: '#007AFF',
-    primaryLight: '#4DA2FF',
-    primaryDark: '#0056CC',
+    primary: '#d06818ff',
+    primaryDark: '#743700',
+    primaryLight: '#cc5200ff',
     
     // Secondary colors
     secondary: '#5856D6',
@@ -80,7 +80,7 @@ export const LIGHT_THEME = {
     
     // Text colors
     text: '#BC6C25',
-    textSecondary: '#3C3C43',
+    textSecondary: '#000000ff',
     textTertiary: '#8E8E93',
     textInverse: '#FFFFFF',
     
@@ -93,6 +93,7 @@ export const LIGHT_THEME = {
     warning: '#FF9500',
     error: '#FF3B30',
     info: '#007AFF',
+    white: '#FFFFFF',
     
     // Overlay
     overlay: 'rgba(0, 0, 0, 0.4)',
@@ -129,73 +130,75 @@ export const LIGHT_THEME = {
 
 export const DARK_THEME = {
   colors: {
-    // Primary colors
-    primary: '#0A84FF',
-    primaryLight: '#409CFF',
-    primaryDark: '#0056CC',
-    
-    // Secondary colors
-    secondary: '#5E5CE6',
-    secondaryLight: '#7D7AFF',
-    secondaryDark: '#3F3EA3',
-    
-    // Background colors
-    background: '#FADCC2',
-    backgroundSecondary: '#1C1C1E',
-    backgroundTertiary: '#2C2C2E',
-    
+    // Primary colors (Deep Peach / Burnt Orange)
+    primary: '#B85A2A',        // Deep Peach (darkened)
+    primaryLight: '#D97A45',   // Warm highlight
+    primaryDark: '#7A3318',    // Burnt coffee
+
+    // Secondary colors (Muted Pine / Olive)
+    secondary: '#6B6A3D',
+    secondaryLight: '#8A894F',
+    secondaryDark: '#4B4A2B',
+
+    // Background colors (Coffee / Pine inspired)
+    background: '#1E140F',             // Dark Coffee
+    backgroundSecondary: '#2A1C16',    // Leather Couch
+    backgroundTertiary: '#35251D',     // Warm Surface
+
     // Surface colors
-    surface: '#1C1C1E',
-    surfaceSecondary: '#2C2C2E',
-    
-    // Text colors
-    text: '#BC6C25',
-    textSecondary: '#EBEBF5',
-    textTertiary: '#8E8E93',
-    textInverse: '#000000',
-    
+    surface: '#2F2019',
+    surfaceSecondary: '#3A2A21',
+
+    // Text colors (Creme based)
+    text: '#F1E3C6',            // Creme
+    textSecondary: '#D8C9A8',   // Muted creme
+    textTertiary: '#A9997A',    // Dusty text
+    textInverse: '#1E140F',
+
     // Border colors
-    border: '#38383A',
-    borderLight: '#48484A',
-    
-    // Status colors
-    success: '#30D158',
-    warning: '#FF9F0A',
-    error: '#FF453A',
-    info: '#64D2FF',
+    border: '#4A3A30',
+    borderLight: '#5A4A3F',
+
+    // Status colors (Earth toned)
+    success: '#7D9A6C',   // Muted green
+    warning: '#C47A2C',   // Clay orange
+    error: '#9E3B2F',     // Muted maroon
+    info: '#8B6F4E',      // Warm neutral info
+    white: '#FFFFFF',
     
     // Overlay
-    overlay: 'rgba(0, 0, 0, 0.6)',
-    
+    overlay: 'rgba(0, 0, 0, 0.65)',
+
     // Card shadow
-    shadow: 'rgba(0, 0, 0, 0.3)',
+    shadow: 'rgba(0, 0, 0, 0.6)',
   },
-  
-  // Shadow styles
+
+  // Shadow styles (softer for dark UI)
   shadows: {
     small: {
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.3,
+      shadowOpacity: 0.4,
       shadowRadius: 2,
       elevation: 2,
     },
     medium: {
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.4,
+      shadowOpacity: 0.5,
       shadowRadius: 4,
       elevation: 4,
     },
     large: {
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.5,
+      shadowOpacity: 0.6,
       shadowRadius: 8,
       elevation: 8,
     },
   },
 } as const;
+
 
 // Export theme type for TypeScript
 export type Theme = typeof LIGHT_THEME;

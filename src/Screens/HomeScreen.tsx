@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  Image,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -8,22 +15,36 @@ import { ThemedView } from '../Components/Themed/ThemedView';
 import { ThemedText } from '../Components/Themed/ThemedText';
 import { ThemedCard } from '../Components/Themed/ThemedCard';
 import { CollectionSection } from '../Components/Regular/CollectionSection';
+import { EmptyState } from '../Components/Regular/EmptyState';
+import { StatCard } from '../Components/Regular/StatCard';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
 import { RootStackParamList, CollectionItem, CollectionStatus } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { calculateCollectionStats } from '../Utils/helpers';
+import { Images } from '../Utils/Imges';
 
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Main'>;
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Main'
+>;
 
 export const HomeScreen: React.FC = () => {
   const { theme } = useTheme();
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { userProfile, appState, getCollectionByStatus, updateItemStatus, removeFromCollection } = useApp();
+  const {
+    userProfile,
+    appState,
+    getCollectionByStatus,
+    updateItemStatus,
+    removeFromCollection,
+  } = useApp();
   const { showSuccess, showError } = useToast();
 
-  const stats = appState?.collections ? calculateCollectionStats(appState.collections) : null;
+  const stats = appState?.collections
+    ? calculateCollectionStats(appState.collections)
+    : null;
 
   const handleItemPress = (item: CollectionItem) => {
     navigation.navigate('MediaDetail', { mediaItem: item.mediaItem });
@@ -51,11 +72,14 @@ export const HomeScreen: React.FC = () => {
           style: 'destructive',
           onPress: () => handleRemoveItem(item),
         },
-      ]
+      ],
     );
   };
 
-  const handleStatusChange = async (item: CollectionItem, newStatus: CollectionStatus) => {
+  const handleStatusChange = async (
+    item: CollectionItem,
+    newStatus: CollectionStatus,
+  ) => {
     try {
       await updateItemStatus(item.id, newStatus);
       const statusLabel = newStatus.replace('_', ' ');
@@ -83,18 +107,21 @@ export const HomeScreen: React.FC = () => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: theme.colors.background,
     },
     header: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
-      paddingVertical: DESIGN_CONSTANTS.SPACING.medium,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
     },
     headerLeft: {
       flex: 1,
+    },
+    headerRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: DESIGN_CONSTANTS.SPACING.small,
     },
     welcomeText: {
       marginBottom: DESIGN_CONSTANTS.SPACING.xsmall,
@@ -105,7 +132,10 @@ export const HomeScreen: React.FC = () => {
     searchButton: {
       padding: DESIGN_CONSTANTS.SPACING.small,
       borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
-      backgroundColor: theme.colors.surface,
+    },
+    statsButton: {
+      padding: DESIGN_CONSTANTS.SPACING.small,
+      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
     },
     content: {
       flex: 1,
@@ -116,48 +146,12 @@ export const HomeScreen: React.FC = () => {
     },
     sectionTitle: {
       marginBottom: DESIGN_CONSTANTS.SPACING.medium,
+      color: theme.colors.primaryDark,
     },
     statsGrid: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       gap: DESIGN_CONSTANTS.SPACING.small,
-    },
-    statCard: {
-      flex: 1,
-      padding: DESIGN_CONSTANTS.SPACING.medium,
-    },
-    statContent: {
-      alignItems: 'center',
-    },
-    statNumber: {
-      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.heading,
-      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.bold,
-      marginVertical: DESIGN_CONSTANTS.SPACING.small,
-    },
-    statLabel: {
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
-    },
-    emptyState: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: DESIGN_CONSTANTS.SPACING.large,
-    },
-    emptyText: {
-      textAlign: 'center',
-      color: theme.colors.textSecondary,
-      marginBottom: DESIGN_CONSTANTS.SPACING.large,
-    },
-    emptyButton: {
-      paddingHorizontal: DESIGN_CONSTANTS.SPACING.large,
-      paddingVertical: DESIGN_CONSTANTS.SPACING.medium,
-      backgroundColor: theme.colors.primary,
-      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
-    },
-    emptyButtonText: {
-      color: theme.colors.background,
-      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.semibold,
     },
   });
 
@@ -165,7 +159,10 @@ export const HomeScreen: React.FC = () => {
   const watchingItems = getCollectionByStatus('watching');
   const willWatchItems = getCollectionByStatus('will_watch');
 
-  const hasAnyItems = watchedItems.length > 0 || watchingItems.length > 0 || willWatchItems.length > 0;
+  const hasAnyItems =
+    watchedItems.length > 0 ||
+    watchingItems.length > 0 ||
+    willWatchItems.length > 0;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -173,20 +170,40 @@ export const HomeScreen: React.FC = () => {
         {/* Header with search button */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <ThemedText variant="title" style={styles.welcomeText}>
+            <ThemedText
+              variant="homeTitle"
+              style={[styles.welcomeText, { color: theme.colors.primaryDark }]}
+            >
               Hi, {userProfile?.name}!
             </ThemedText>
-            <ThemedText variant="body" style={styles.subtitle}>
+            <ThemedText variant="body" style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
               Track your favorite movies and TV shows
             </ThemedText>
           </View>
-          
-          <TouchableOpacity
-            style={styles.searchButton}
-            onPress={() => navigation.navigate('Search')}
-          >
-            <Icon name="search" size={24} color={theme.colors.primary} />
-          </TouchableOpacity>
+
+          <View style={styles.headerRight}>
+            <TouchableOpacity
+              style={styles.statsButton}
+              onPress={() => navigation.navigate('Statistics')}
+            >
+              <Icon name="bar-chart" size={20} color={theme.colors.primaryDark} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.searchButton}
+              onPress={() => navigation.navigate('Search')}
+            >
+              <Image
+                source={Images.search}
+                style={{
+                  width: 20,
+                  height: 20,
+                  tintColor: theme.colors.primaryDark,
+                }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -196,43 +213,28 @@ export const HomeScreen: React.FC = () => {
               <ThemedText variant="subtitle" style={styles.sectionTitle}>
                 Your Collection
               </ThemedText>
-              
+
               <View style={styles.statsGrid}>
-                <ThemedCard style={styles.statCard}>
-                  <View style={styles.statContent}>
-                    <Icon name="checkmark-circle" size={24} color={theme.colors.success} />
-                    <ThemedText variant="body" style={styles.statNumber}>
-                      {stats.watched}
-                    </ThemedText>
-                    <ThemedText variant="caption" style={styles.statLabel}>
-                      Watched
-                    </ThemedText>
-                  </View>
-                </ThemedCard>
+                <StatCard
+                  iconName="checkmark-circle"
+                  iconColor={theme.colors.success}
+                  number={stats.watched}
+                  label="Watched"
+                />
 
-                <ThemedCard style={styles.statCard}>
-                  <View style={styles.statContent}>
-                    <Icon name="play-circle" size={24} color={theme.colors.primary} />
-                    <ThemedText variant="body" style={styles.statNumber}>
-                      {stats.watching}
-                    </ThemedText>
-                    <ThemedText variant="caption" style={styles.statLabel}>
-                      Watching
-                    </ThemedText>
-                  </View>
-                </ThemedCard>
+                <StatCard
+                  iconName="play-circle"
+                  iconColor={theme.colors.primary}
+                  number={stats.watching}
+                  label="Watching"
+                />
 
-                <ThemedCard style={styles.statCard}>
-                  <View style={styles.statContent}>
-                    <Icon name="bookmark" size={24} color={theme.colors.warning} />
-                    <ThemedText variant="body" style={styles.statNumber}>
-                      {stats.willWatch}
-                    </ThemedText>
-                    <ThemedText variant="caption" style={styles.statLabel}>
-                      Wishlist
-                    </ThemedText>
-                  </View>
-                </ThemedCard>
+                <StatCard
+                  iconName="bookmark"
+                  iconColor={theme.colors.warning}
+                  number={stats.willWatch}
+                  label="Wishlist"
+                />
               </View>
             </View>
           )}
@@ -247,7 +249,7 @@ export const HomeScreen: React.FC = () => {
                 onItemLongPress={handleItemLongPress}
                 onSeeAll={() => handleSeeAll('watching')}
               />
-              
+
               <CollectionSection
                 title="Want to Watch"
                 items={willWatchItems}
@@ -255,7 +257,7 @@ export const HomeScreen: React.FC = () => {
                 onItemLongPress={handleItemLongPress}
                 onSeeAll={() => handleSeeAll('will_watch')}
               />
-              
+
               <CollectionSection
                 title="Watched"
                 items={watchedItems}
@@ -266,18 +268,18 @@ export const HomeScreen: React.FC = () => {
             </>
           ) : (
             /* Empty State */
-            <View style={styles.emptyState}>
-              <ThemedText variant="body" style={styles.emptyText}>
-                Your collection is empty.{'\n'}Start by searching for movies and TV shows to add to your collection.
-              </ThemedText>
-              <TouchableOpacity
-                style={styles.emptyButton}
-                onPress={() => navigation.navigate('Search')}
-              >
-                <ThemedText style={styles.emptyButtonText}>
-                  Search Movies & TV Shows
-                </ThemedText>
-              </TouchableOpacity>
+            <View
+              style={{
+                height: 700,
+              }}
+            >
+              <EmptyState
+                icon="bookmark-outline"
+                title="Your Collection is Empty"
+                message="Start by searching for movies and TV shows to add to your collection."
+                buttonText="Search Movies & TV Shows"
+                onButtonPress={() => navigation.navigate('Search')}
+              />
             </View>
           )}
         </ScrollView>

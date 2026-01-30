@@ -10,188 +10,276 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   mediaItem,
   onPress,
   onLongPress,
-  showStatus = false,
-  collectionStatus,
+  // showStatus = false,
+  // collectionStatus,
 }) => {
   const { theme } = useTheme();
 
-  const getStatusIcon = () => {
-    switch (collectionStatus) {
-      case 'watched':
-        return 'checkmark-circle';
-      case 'watching':
-        return 'play-circle';
-      case 'will_watch':
-        return 'bookmark';
-      default:
-        return null;
-    }
-  };
+  // const getStatusColor = () => {
+  //   switch (collectionStatus) {
+  //     case 'watched':
+  //       return theme.colors.success;
+  //     case 'watching':
+  //       return theme.colors.primary;
+  //     case 'will_watch':
+  //       return theme.colors.warning;
+  //     default:
+  //       return theme.colors.primary;
+  //   }
+  // };
 
-  const getStatusColor = () => {
-    switch (collectionStatus) {
-      case 'watched':
-        return theme.colors.success;
-      case 'watching':
-        return theme.colors.primary;
-      case 'will_watch':
-        return theme.colors.warning;
-      default:
-        return theme.colors.textSecondary;
-    }
-  };
+  // const statusColor = getStatusColor();
 
-  const statusColor = getStatusColor();
-  
   const styles = StyleSheet.create({
     container: {
       backgroundColor: theme.colors.surface,
-      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
-      width: '100%',
       overflow: 'hidden',
-      elevation: 2,
-      shadowColor: theme.colors.shadow,
+      height: 190,
+      width: '100%',
+      elevation: 4,
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
+      shadowOpacity: 0.15,
       shadowRadius: 4,
-      borderWidth: showStatus && collectionStatus ? 1 : 0,
-      borderColor: showStatus && collectionStatus ? statusColor : 'transparent',
-    },
-    content: {
+      // marginVertical: DESIGN_CONSTANTS.SPACING.small,
       flexDirection: 'row',
-      padding: DESIGN_CONSTANTS.SPACING.medium,
     },
-    poster: {
-      width: 80,
-      height: 120,
-      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.small,
-      backgroundColor: theme.colors.border,
-    },
-    posterPlaceholder: {
-      width: 80,
-      height: 120,
-      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.small,
-      backgroundColor: theme.colors.border,
+    posterSection: {
+      width: "35%",
+      backgroundColor: theme.colors.backgroundTertiary,
       justifyContent: 'center',
       alignItems: 'center',
     },
-    info: {
-      flex: 1,
-      marginLeft: DESIGN_CONSTANTS.SPACING.medium,
-      justifyContent: 'space-between',
+    poster: {
+      width: '80%',
+      height: '80%'
     },
-    header: {
-      flexDirection: 'row',
+    posterPlaceholder: {
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.border,
+    },
+    middleSection: {
+      flex: 1,
+      padding: DESIGN_CONSTANTS.SPACING.small,
       justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      marginBottom: DESIGN_CONSTANTS.SPACING.small,
+      backgroundColor: theme.colors.primaryDark,
     },
     title: {
-      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.subtitle,
-      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.semibold,
-      color: theme.colors.text,
-      flex: 1,
-      marginRight: DESIGN_CONSTANTS.SPACING.small,
-      flexWrap: 'wrap',
-    },
-    statusIcon: {
-      marginLeft: DESIGN_CONSTANTS.SPACING.small,
+      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.title,
+      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.bold,
+      color: theme.colors.white,
+      marginBottom: DESIGN_CONSTANTS.SPACING.medium,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
     },
     overview: {
       fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption,
-      color: theme.colors.textSecondary,
-      lineHeight: 18,
-      marginBottom: DESIGN_CONSTANTS.SPACING.small,
-      flexShrink: 1,
+      color: theme.colors.white,
+      // lineHeight: 22,
+      // marginBottom: DESIGN_CONSTANTS.SPACING.medium,
+      flex: 1,
     },
     metadata: {
       flexDirection: 'row',
       alignItems: 'center',
-      flexWrap: 'wrap',
+      gap: DESIGN_CONSTANTS.SPACING.small,
     },
     metadataItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginRight: DESIGN_CONSTANTS.SPACING.medium,
-      marginBottom: DESIGN_CONSTANTS.SPACING.xsmall,
+      gap: 4,
     },
     metadataText: {
-      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption,
-      color: theme.colors.textSecondary,
-      marginLeft: DESIGN_CONSTANTS.SPACING.xsmall,
-      flexShrink: 1,
+      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body,
+      color: theme.colors.white,
+      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.medium,
     },
-    mediaType: {
+    mediaTypeTag: {
+      backgroundColor: theme.colors.white,
+      borderRadius: 20,
+      paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
+      paddingVertical: DESIGN_CONSTANTS.SPACING.xsmall,
+      alignSelf: 'flex-start',
+      zIndex: 1,
+    },
+    mediaTypeText: {
       fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption,
       color: theme.colors.primary,
-      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.medium,
+      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.semibold,
       textTransform: 'uppercase',
       letterSpacing: 0.5,
-      flexShrink: 0,
+    },
+    barcodeSection: {
+      width: 50,
+      backgroundColor: theme.colors.primaryDark,
+      paddingHorizontal: DESIGN_CONSTANTS.SPACING.xsmall,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    barcode: {
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 2,
+      height: '80%',
+    },
+    barLine: {
+      width: 30,
+      height: 2,
+      backgroundColor: theme.colors.white,
+    },
+    barLineThin: {
+      width: 30,
+      height: 1,
+      backgroundColor: theme.colors.white,
+    },
+    leftCircle: {
+      position: 'absolute',
+      left: -20,
+      top: '50%',
+      width: 30,
+      height: 30,
+      borderRadius: 20,
+      backgroundColor: theme.colors.background,
+      transform: [{ translateY: -20 }],
+      zIndex: 1,
+    },
+    rightCircle: {
+      position: 'absolute',
+      right: -20,
+      top: '50%',
+      width: 30,
+      height: 30,
+      borderRadius: 20,
+      backgroundColor: theme.colors.background,
+      transform: [{ translateY: -20 }],
+      zIndex: 1,
+    },
+    topTriangle: {
+      position: 'absolute',
+      top: -20,
+      left: '35%',
+      width: 25,
+      height: 25,
+      backgroundColor: theme.colors.background,
+      transform: [{ translateX: -15 }, { rotate: '45deg' }],
+      zIndex: 1,
+    },
+    bottomTriangle: {
+      position: 'absolute',
+      bottom: -20,
+      left: '35%',
+      width: 25,
+      height: 25,
+      backgroundColor: theme.colors.background,
+      transform: [{ translateX: -15 }, { rotate: '45deg' }],
+      zIndex: 1,
     },
   });
 
-  const posterUrl = mediaItem.posterPath ? getTMDBImageUrl(mediaItem.posterPath, 'w342') : null;
-  const truncatedOverview = mediaItem.overview.length > 150 
-    ? `${mediaItem.overview.substring(0, 150)}...` 
-    : mediaItem.overview;
+  // Generate barcode pattern
+  const generateBarcode = () => {
+    const bars = [];
+    for (let i = 0; i < 35; i++) {
+      const isThin = Math.random() > 0.5;
+      bars.push(
+        <View
+          key={i}
+          style={isThin ? styles.barLineThin : styles.barLine}
+        />
+      );
+    }
+    return bars;
+  };
+
+  const posterUrl = mediaItem.posterPath
+    ? getTMDBImageUrl(mediaItem.posterPath, 'w342')
+    : null;
+
+  const truncatedOverview =
+    mediaItem.overview.length > 800
+      ? `${mediaItem.overview.substring(0, 800)}...`
+      : mediaItem.overview;
 
   return (
-    <TouchableOpacity 
-      style={styles.container} 
-      onPress={onPress} 
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
       onLongPress={onLongPress}
       activeOpacity={0.7}
     >
-      <View style={styles.content}>
+      <View style={styles.leftCircle}></View>
+      <View style={styles.rightCircle}></View>
+
+      <View style={styles.topTriangle}></View>
+      <View style={styles.bottomTriangle}></View>
+      {/* Left Poster Section */}
+      <View style={styles.posterSection}>
         {posterUrl ? (
-          <Image source={{ uri: posterUrl }} style={styles.poster} resizeMode="cover" />
+          <Image
+            source={{ uri: posterUrl }}
+            style={styles.poster}
+            resizeMode="cover"
+          />
         ) : (
           <View style={styles.posterPlaceholder}>
-            <Icon name="image-outline" size={24} color={theme.colors.textSecondary} />
+            <Icon
+              name="image-outline"
+              size={32}
+              color={theme.colors.textSecondary}
+            />
           </View>
         )}
-        
-        <View style={styles.info}>
-          <View style={styles.header}>
-            <Text style={styles.title} numberOfLines={2}>
-              {mediaItem.title}
-            </Text>
-            {showStatus && collectionStatus && (
-              <Icon
-                name={getStatusIcon()!}
-                size={20}
-                color={statusColor}
-                style={styles.statusIcon}
-              />
-            )}
-          </View>
-          
+      </View>
+
+      {/* Middle Content Section */}
+      <View style={styles.middleSection}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.title} numberOfLines={0}>
+            {mediaItem.title}
+          </Text>
+
+
+
           {truncatedOverview ? (
-            <Text style={styles.overview} numberOfLines={3}>
+            <Text style={styles.overview} numberOfLines={6}>
               {truncatedOverview}
             </Text>
           ) : null}
-          
+        </View>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: DESIGN_CONSTANTS.SPACING.medium }}>
           <View style={styles.metadata}>
             <View style={styles.metadataItem}>
-              <Icon name="calendar-outline" size={14} color={theme.colors.textSecondary} />
+              <Icon name="calendar" size={16} color={theme.colors.white} />
               <Text style={styles.metadataText}>
                 {formatReleaseDate(mediaItem.releaseDate)}
               </Text>
             </View>
-            
+
             <View style={styles.metadataItem}>
-              <Icon name="star" size={14} color={theme.colors.warning} />
+              <Icon name="star" size={16} color="#FFFFFF" />
               <Text style={styles.metadataText}>
                 {mediaItem.voteAverage.toFixed(1)}
               </Text>
             </View>
-            
-            <Text style={styles.mediaType}>
+          </View>
+
+          <View style={styles.mediaTypeTag}>
+            <Text style={styles.mediaTypeText}>
               {mediaItem.mediaType === 'tv' ? 'TV Show' : 'Movie'}
             </Text>
           </View>
+        </View>
+      </View>
+
+      {/* Right Barcode Section */}
+      <View style={styles.barcodeSection}>
+        <View style={styles.barcode}>
+          {generateBarcode()}
         </View>
       </View>
     </TouchableOpacity>

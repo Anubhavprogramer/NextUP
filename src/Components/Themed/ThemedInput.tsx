@@ -37,36 +37,32 @@ export const ThemedInput: React.FC<ThemedInputProps> = ({
     onBlur?.(e);
   };
 
-  const getBorderColor = () => {
-    if (error) return theme.colors.error;
-    if (isFocused) return theme.colors.primary;
-    return theme.colors.border;
-  };
 
   const inputStyle = [
     styles.input,
     {
       backgroundColor: theme.colors.surface,
-      borderColor: getBorderColor(),
-      color: theme.colors.text,
+      borderColor: theme.colors.background,
+      color: theme.colors.text
     },
     style,
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {label && (
         <ThemedText variant="body" style={styles.label}>
           {label}
         </ThemedText>
       )}
       <TextInput
-        style={inputStyle}
-        placeholderTextColor={theme.colors.textTertiary}
+        style={[inputStyle,{backgroundColor: theme.colors.background}]}
+        placeholderTextColor={theme.colors.text}
         onFocus={handleFocus}
         onBlur={handleBlur}
         {...otherProps}
       />
+      <View style={{ height: 3, backgroundColor: theme.colors.primary, borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.small }} />
       {error && (
         <ThemedText
           variant="caption"

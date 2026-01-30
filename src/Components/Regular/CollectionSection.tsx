@@ -48,7 +48,7 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
     },
     itemContainer: {
       marginRight: DESIGN_CONSTANTS.SPACING.medium,
-      width: Dimensions.get('window').width * 0.8, // Fixed width for consistent layout
+      width: Dimensions.get('window').width * 0.9, // Fixed width for consistent layout
     },
     emptyContainer: {
       paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
@@ -59,13 +59,16 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
       color: theme.colors.textSecondary,
       textAlign: 'center',
     },
+    sectionTitle: {
+      color: theme.colors.primaryDark,
+    },
   });
 
   if (items.length === 0) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <ThemedText variant="subtitle">{title}</ThemedText>
+          <ThemedText variant="subtitle" style={styles.sectionTitle}>{title}</ThemedText>
         </View>
         <View style={styles.emptyContainer}>
           <ThemedText variant="body" style={styles.emptyText}>
@@ -79,7 +82,7 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <ThemedText variant="subtitle">{title}</ThemedText>
+        <ThemedText variant="subtitle" style={styles.sectionTitle}>{title}</ThemedText>
         {items.length > 5 && onSeeAll && (
           <TouchableOpacity style={styles.seeAllButton} onPress={onSeeAll}>
             <ThemedText style={styles.seeAllText}>See All</ThemedText>
@@ -98,8 +101,8 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
               mediaItem={item.mediaItem}
               onPress={() => onItemPress?.(item)}
               onLongPress={() => onItemLongPress?.(item)}
-              showStatus={false}
-              collectionStatus={item.status}
+              // showStatus={false}
+              // collectionStatus={item.status}
             />
           </View>
         ))}

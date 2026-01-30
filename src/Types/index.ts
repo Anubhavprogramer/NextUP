@@ -83,6 +83,7 @@ export type RootStackParamList = {
   Search: undefined;
   Collection: { status: CollectionStatus };
   MediaDetail: { mediaItem: MediaItem };
+  Statistics: undefined;
   Settings: undefined;
 };
 
