@@ -31,8 +31,6 @@ export const CustomHeader: React.FC<CustomHeaderProps> = ({
       alignItems: 'center',
       paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
       paddingVertical: DESIGN_CONSTANTS.SPACING.medium,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
       backgroundColor: theme.colors.background,
     },
     leftContainer: {
@@ -41,6 +39,9 @@ export const CustomHeader: React.FC<CustomHeaderProps> = ({
       flex: 1,
     },
     backButton: {
+      position: 'absolute',
+      left: 0,
+
       padding: DESIGN_CONSTANTS.SPACING.small,
       marginRight: DESIGN_CONSTANTS.SPACING.small,
     },
@@ -48,9 +49,9 @@ export const CustomHeader: React.FC<CustomHeaderProps> = ({
       flex: 1,
     },
     title: {
-        color: '#000000',
-        justifyContent: 'center',
-        textAlign: 'center',
+      color: '#000000',
+      justifyContent: 'center',
+      textAlign: 'center',
     },
     rightButton: {
       padding: DESIGN_CONSTANTS.SPACING.small,
@@ -59,19 +60,19 @@ export const CustomHeader: React.FC<CustomHeaderProps> = ({
 
   return (
     <View style={styles.container}>
-        {showBack && (
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Icon name="chevron-back" size={24} color={theme.colors.primary} />
-          </TouchableOpacity>
-        )}
-        <View style={styles.titleContainer}>
-          <ThemedText variant="subtitle" style={styles.title}>
-            {title}
-          </ThemedText>
-        </View>
+      {showBack && (
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Icon name="chevron-back" size={24} color={theme.colors.primaryDark} />
+        </TouchableOpacity>
+      )}
+      <View style={styles.titleContainer}>
+        <ThemedText variant="subtitle" style={styles.title}>
+          {title}
+        </ThemedText>
+      </View>
 
       {rightAction && (
         <TouchableOpacity
@@ -80,7 +81,11 @@ export const CustomHeader: React.FC<CustomHeaderProps> = ({
           accessible
           accessibilityLabel={rightAction.accessibilityLabel}
         >
-          <Icon name={rightAction.iconName} size={24} color={theme.colors.primary} />
+          <Icon
+            name={rightAction.iconName}
+            size={24}
+            color={theme.colors.primaryDark}
+          />
         </TouchableOpacity>
       )}
     </View>
