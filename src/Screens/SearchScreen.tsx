@@ -9,8 +9,7 @@ import { MediaList } from '../Components/Regular/MediaList';
 import { SearchHeader } from '../Components/Regular/SearchHeader';
 import { CustomHeader } from '../Components/Regular/CustomHeader';
 import { MediaItem, APIError } from '../Types';
-import { searchMulti, testTMDBConnection } from '../API/tmdb';
-import { runFullDebug } from '../API/debug';
+import { searchMulti } from '../API/tmdb';
 import { DESIGN_CONSTANTS } from '../Utils';
 
 export const SearchScreen: React.FC = () => {
@@ -22,9 +21,6 @@ export const SearchScreen: React.FC = () => {
   const [currentQuery, setCurrentQuery] = useState('');
 
   // Test API connection on component mount
-  useEffect(() => {
-    testTMDBConnection();
-  }, []);
 
   const handleSearch = useCallback(async (query: string) => {
     setCurrentQuery(query);

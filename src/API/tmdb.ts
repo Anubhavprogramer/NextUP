@@ -366,17 +366,3 @@ export async function getTVImages(tvId: number): Promise<any> {
   return tmdbFetch<any>(`/tv/${tvId}/images`);
 }
 
-/**
- * Test TMDB API connection
- */
-export async function testTMDBConnection(): Promise<boolean> {
-  try {
-    console.log('🧪 Testing TMDB API connection...');
-    const response = await tmdbFetch<any>('/configuration');
-    console.log('✅ TMDB API connection successful');
-    return true;
-  } catch (error) {
-    console.error('❌ TMDB API connection failed:', error);
-    return false;
-  }
-}
