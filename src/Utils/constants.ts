@@ -133,7 +133,7 @@ export const DARK_THEME = {
     // Primary colors (Deep Peach / Burnt Orange)
     primary: '#B85A2A',        // Deep Peach (darkened)
     primaryLight: '#D97A45',   // Warm highlight
-    primaryDark: '#7A3318',    // Burnt coffee
+    primaryDark: '#d4886bff',    // Burnt coffee
 
     // Secondary colors (Muted Pine / Olive)
     secondary: '#6B6A3D',
@@ -151,7 +151,7 @@ export const DARK_THEME = {
 
     // Text colors (Creme based)
     text: '#F1E3C6',            // Creme
-    textSecondary: '#D8C9A8',   // Muted creme
+    textSecondary: '#f1af95ff',   // Muted creme
     textTertiary: '#A9997A',    // Dusty text
     textInverse: '#1E140F',
 

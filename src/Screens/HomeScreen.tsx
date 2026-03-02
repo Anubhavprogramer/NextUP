@@ -182,12 +182,6 @@ export const HomeScreen: React.FC = () => {
           </View>
 
           <View style={styles.headerRight}>
-            <TouchableOpacity
-              style={styles.statsButton}
-              onPress={() => navigation.navigate('Statistics')}
-            >
-              <Icon name="bar-chart" size={20} color={theme.colors.primaryDark} />
-            </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.searchButton}

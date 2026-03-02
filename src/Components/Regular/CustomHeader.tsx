@@ -30,7 +30,8 @@ export const CustomHeader: React.FC<CustomHeaderProps> = ({
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
-      paddingVertical: DESIGN_CONSTANTS.SPACING.medium,
+      paddingTop: DESIGN_CONSTANTS.SPACING.medium + 15,
+      paddingBottom: DESIGN_CONSTANTS.SPACING.medium,
       backgroundColor: theme.colors.background,
     },
     leftContainer: {
@@ -41,7 +42,7 @@ export const CustomHeader: React.FC<CustomHeaderProps> = ({
     backButton: {
       position: 'absolute',
       left: 0,
-
+      top: DESIGN_CONSTANTS.SPACING.medium + 10,
       padding: DESIGN_CONSTANTS.SPACING.small,
       marginRight: DESIGN_CONSTANTS.SPACING.small,
     },
@@ -49,7 +50,7 @@ export const CustomHeader: React.FC<CustomHeaderProps> = ({
       flex: 1,
     },
     title: {
-      color: '#000000',
+      color: theme.colors.primaryDark,
       justifyContent: 'center',
       textAlign: 'center',
     },

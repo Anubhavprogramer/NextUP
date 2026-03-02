@@ -6,7 +6,6 @@ import { HomeScreen } from '../Screens/HomeScreen';
 import { SearchScreen } from '../Screens/SearchScreen';
 import { CollectionScreen } from '../Screens/CollectionScreen';
 import { MediaDetailScreen } from '../Screens/MediaDetailScreen';
-import { StatisticsScreen } from '../Screens/StatisticsScreen';
 import { LoadingScreen } from '../Screens/LoadingScreen';
 import { ErrorScreen } from '../Screens/ErrorScreen';
 import { useApp } from '../Store/AppContext';
@@ -73,14 +72,6 @@ export const AppNavigator: React.FC = () => {
             headerShown: false,
             headerBackTitleVisible: false,
             title: 'Media Details',
-          }}
-        />
-        <Stack.Screen 
-          name="Statistics" 
-          component={StatisticsScreen}
-          options={{
-            headerShown: false,
-            title: 'Statistics',
           }}
         />
       </Stack.Navigator>
