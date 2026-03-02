@@ -127,7 +127,7 @@ export const Toast: React.FC<ToastProps> = ({
     },
     message: {
       fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body,
-      color: theme.colors.text,
+      color: theme.colors.primaryDark,
       fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.medium,
     },
   });

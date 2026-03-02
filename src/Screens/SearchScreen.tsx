@@ -20,7 +20,6 @@ export const SearchScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [currentQuery, setCurrentQuery] = useState('');
 
-  // Test API connection on component mount
 
   const handleSearch = useCallback(async (query: string) => {
     setCurrentQuery(query);
