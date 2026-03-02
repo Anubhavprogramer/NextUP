@@ -54,7 +54,6 @@ export const AppNavigator: React.FC = () => {
           options={{
             headerShown: false,
             title: 'Search Movies & TV Shows',
-            headerBackTitleVisible: false,
           }}
         />
         <Stack.Screen 
@@ -62,7 +61,6 @@ export const AppNavigator: React.FC = () => {
           component={CollectionScreen}
           options={{
             headerShown: false,
-            headerBackTitleVisible: false,
           }}
         />
         <Stack.Screen 
@@ -70,7 +68,6 @@ export const AppNavigator: React.FC = () => {
           component={MediaDetailScreen}
           options={{
             headerShown: false,
-            headerBackTitleVisible: false,
             title: 'Media Details',
           }}
         />
