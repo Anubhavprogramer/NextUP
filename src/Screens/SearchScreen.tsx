@@ -11,6 +11,7 @@ import { CustomHeader } from '../Components/Regular/CustomHeader';
 import { MediaItem, APIError } from '../Types';
 import { searchMulti } from '../API/tmdb';
 import { DESIGN_CONSTANTS } from '../Utils';
+import { useDebounce } from '../Store/hooks';
 
 export const SearchScreen: React.FC = () => {
   const { theme } = useTheme();
@@ -19,33 +20,32 @@ export const SearchScreen: React.FC = () => {
   const [searchResults, setSearchResults] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentQuery, setCurrentQuery] = useState('');
+  const debouncedSearch = useDebounce(currentQuery, 600);
 
-
-  const handleSearch = useCallback(async (query: string) => {
-    setCurrentQuery(query);
-    
-    if (!query.trim()) {
+  useEffect(() => {
+  const fetchSearch = async () => {
+    if (!debouncedSearch.trim()) {
       setSearchResults([]);
       setLoading(false);
       return;
     }
 
     setLoading(true);
-    
+
     try {
-      const response = await searchMulti(query.trim());
-      
-      // Filter out person results and invalid items
-      const validResults = response.results.filter(item => 
-        item.mediaType === 'movie' || item.mediaType === 'tv'
+      const response = await searchMulti(debouncedSearch.trim());
+
+      const validResults = response.results.filter(
+        item => item.mediaType === 'movie' || item.mediaType === 'tv'
       );
-      
+
       setSearchResults(validResults);
+
     } catch (error) {
       console.error('Search error:', error);
-      
+
       let errorMessage = 'An unexpected error occurred. Please try again.';
-      
+
       if (error instanceof APIError) {
         if (error.code === 'NETWORK_ERROR') {
           errorMessage = 'Network connection failed. Please check your internet connection and try again.';
@@ -55,63 +55,79 @@ export const SearchScreen: React.FC = () => {
           errorMessage = 'Unable to search at the moment. Please try again.';
         }
       }
-      
+
       showError(errorMessage);
-      
       setSearchResults([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  fetchSearch();
+}, [debouncedSearch]);
+
+  const handleSearch = useCallback((query: string) => {
+    setCurrentQuery(query);
   }, []);
 
-  const handleItemPress = useCallback((mediaItem: MediaItem) => {
-    // Check if item is already in collection
-    const existingItem = findItemByMediaId(mediaItem.id);
-    
-    if (existingItem) {
-      const statusLabel = existingItem.status.replace('_', ' ');
-      showInfo(`Already in ${statusLabel} collection`);
-      return;
-    }
+  const handleItemPress = useCallback(
+    (mediaItem: MediaItem) => {
+      // Check if item is already in collection
+      const existingItem = findItemByMediaId(mediaItem.id);
 
-    // Show collection selection
-    Alert.alert(
-      'Add to Collection',
-      `Add "${mediaItem.title}" to which collection?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Want to Watch',
-          onPress: () => handleAddToCollection(mediaItem, 'will_watch'),
-        },
-        {
-          text: 'Currently Watching',
-          onPress: () => handleAddToCollection(mediaItem, 'watching'),
-        },
-        {
-          text: 'Watched',
-          onPress: () => handleAddToCollection(mediaItem, 'watched'),
-        },
-      ]
-    );
-  }, [findItemByMediaId, showInfo]);
+      if (existingItem) {
+        const statusLabel = existingItem.status.replace('_', ' ');
+        showInfo(`Already in ${statusLabel} collection`);
+        return;
+      }
 
-  const handleAddToCollection = useCallback(async (
-    mediaItem: MediaItem, 
-    status: 'watched' | 'watching' | 'will_watch'
-  ) => {
-    try {
-      await addToCollection(mediaItem, status);
-      
-      const statusName = status === 'will_watch' ? 'Want to Watch' : 
-                        status === 'watching' ? 'Currently Watching' : 'Watched';
-      
-      showSuccess(`Added to ${statusName}`);
-    } catch (error) {
-      console.error('Add to collection error:', error);
-      showError('Unable to add to collection');
-    }
-  }, [addToCollection, showSuccess, showError]);
+      // Show collection selection
+      Alert.alert(
+        'Add to Collection',
+        `Add "${mediaItem.title}" to which collection?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Want to Watch',
+            onPress: () => handleAddToCollection(mediaItem, 'will_watch'),
+          },
+          {
+            text: 'Currently Watching',
+            onPress: () => handleAddToCollection(mediaItem, 'watching'),
+          },
+          {
+            text: 'Watched',
+            onPress: () => handleAddToCollection(mediaItem, 'watched'),
+          },
+        ],
+      );
+    },
+    [findItemByMediaId, showInfo],
+  );
+
+  const handleAddToCollection = useCallback(
+    async (
+      mediaItem: MediaItem,
+      status: 'watched' | 'watching' | 'will_watch',
+    ) => {
+      try {
+        await addToCollection(mediaItem, status);
+
+        const statusName =
+          status === 'will_watch'
+            ? 'Want to Watch'
+            : status === 'watching'
+            ? 'Currently Watching'
+            : 'Watched';
+
+        showSuccess(`Added to ${statusName}`);
+      } catch (error) {
+        console.error('Add to collection error:', error);
+        showError('Unable to add to collection');
+      }
+    },
+    [addToCollection, showSuccess, showError],
+  );
 
   const handleRefresh = useCallback(() => {
     if (currentQuery) {
@@ -139,13 +155,15 @@ export const SearchScreen: React.FC = () => {
   });
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={styles.container}
+      edges={['top', 'left', 'right', 'bottom']}
+    >
       <SearchHeader
         onSearch={handleSearch}
         placeholder="Search movies and TV shows..."
-        debounceMs={300}
       />
-      
+
       <View style={styles.content}>
         <MediaList
           data={searchResults}

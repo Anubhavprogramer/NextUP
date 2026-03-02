@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../../Store/ThemeContext';
@@ -15,30 +21,14 @@ export interface SearchHeaderProps {
 export const SearchHeader: React.FC<SearchHeaderProps> = ({
   onSearch,
   placeholder = 'Search movies and TV shows...',
-  debounceMs = 300,
+  // debounceMs = 300,
 }) => {
   const { theme } = useTheme();
   const navigation = useNavigation();
   const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, debounceMs);
-
-    return () => clearTimeout(timer);
-  }, [query, debounceMs]);
-
-  // Trigger search when debounced query changes
-  useEffect(() => {
-    onSearch(debouncedQuery);
-  }, [debouncedQuery, onSearch]);
 
   const handleClear = useCallback(() => {
     setQuery('');
-    setDebouncedQuery('');
     onSearch('');
   }, [onSearch]);
 
@@ -96,17 +86,24 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
 
       <View style={styles.searchContainer}>
         <View style={styles.searchIcon}>
-            <Image
-              source={Images.search}
-              style={{ width: 22, height: 22, tintColor: theme.colors.primaryDark }}
-              resizeMode="contain"
-            />
+          <Image
+            source={Images.search}
+            style={{
+              width: 22,
+              height: 22,
+              tintColor: theme.colors.primaryDark,
+            }}
+            resizeMode="contain"
+          />
         </View>
 
         <TextInput
           style={styles.input}
           value={query}
-          onChangeText={setQuery}
+          onChangeText={text => {
+            setQuery(text);
+            onSearch(text);
+          }}
           placeholder={placeholder}
           placeholderTextColor={theme.colors.textSecondary}
           autoCapitalize="none"
