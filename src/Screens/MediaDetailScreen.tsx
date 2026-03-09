@@ -20,7 +20,6 @@ import { RootStackParamList, CollectionStatus } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { formatReleaseDate, getTMDBImageUrl } from '../Utils/helpers';
 import { CustomHeader } from '../Components';
-import { Color } from 'react-native/types_generated/Libraries/Animated/AnimatedExports';
 
 type MediaDetailScreenRouteProp = RouteProp<RootStackParamList, 'MediaDetail'>;
 type MediaDetailScreenNavigationProp = NativeStackNavigationProp<
@@ -39,6 +38,7 @@ export const MediaDetailScreen: React.FC = () => {
     removeFromCollection,
   } = useApp();
   const { showSuccess, showError } = useToast();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const { mediaItem } = route.params;
 
@@ -60,23 +60,29 @@ export const MediaDetailScreen: React.FC = () => {
 
   const handleAddToCollection = async (status: CollectionStatus) => {
     try {
+      setIsLoading(true);
       await addToCollection(mediaItem, status);
       const statusLabel = status.replace('_', ' ');
       showSuccess(`Added to ${statusLabel}`);
     } catch (error) {
       showError('Failed to add to collection');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleStatusChange = async (newStatus: CollectionStatus) => {
-    if (!collectionItem) return;
+    if (!collectionItem || collectionItem.status === newStatus) return;
 
     try {
+      setIsLoading(true);
       await updateItemStatus(collectionItem.id, newStatus);
       const statusLabel = newStatus.replace('_', ' ');
       showSuccess(`Moved to ${statusLabel}`);
     } catch (error) {
       showError('Failed to update status');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,11 +90,14 @@ export const MediaDetailScreen: React.FC = () => {
     if (!collectionItem) return;
 
     try {
+      setIsLoading(true);
       await removeFromCollection(collectionItem.id);
       showSuccess('Removed from collection');
       navigation.goBack();
     } catch (error) {
       showError('Failed to remove item');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -176,6 +185,9 @@ export const MediaDetailScreen: React.FC = () => {
     },
     statusButtonTextActive: {
       color: theme.colors.background,
+    },
+    statusButtonDisabled: {
+      opacity: 0.6,
     },
     removeButton: {
       backgroundColor: theme.colors.error,
@@ -291,12 +303,16 @@ export const MediaDetailScreen: React.FC = () => {
 
                   <View style={styles.statusSection}>
                     <TouchableOpacity
+                      disabled={isLoading || collectionItem.status === 'will_watch'}
                       style={[
                         styles.statusButton,
                         collectionItem.status === 'will_watch' &&
                           styles.statusButtonActive,
+                        isLoading && collectionItem.status !== 'will_watch' &&
+                          styles.statusButtonDisabled,
                       ]}
                       onPress={() => handleStatusChange('will_watch')}
+                      activeOpacity={isLoading || collectionItem.status === 'will_watch' ? 1 : 0.7}
                     >
                       <Icon
                         name="bookmark"
@@ -310,12 +326,16 @@ export const MediaDetailScreen: React.FC = () => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
+                      disabled={isLoading || collectionItem.status === 'watching'}
                       style={[
                         styles.statusButton,
                         collectionItem.status === 'watching' &&
                           styles.statusButtonActive,
+                        isLoading && collectionItem.status !== 'watching' &&
+                          styles.statusButtonDisabled,
                       ]}
                       onPress={() => handleStatusChange('watching')}
+                      activeOpacity={isLoading || collectionItem.status === 'watching' ? 1 : 0.7}
                     >
                       <Icon
                         name="play-circle"
@@ -329,12 +349,16 @@ export const MediaDetailScreen: React.FC = () => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
+                      disabled={isLoading || collectionItem.status === 'watched'}
                       style={[
                         styles.statusButton,
                         collectionItem.status === 'watched' &&
                           styles.statusButtonActive,
+                        isLoading && collectionItem.status !== 'watched' &&
+                          styles.statusButtonDisabled,
                       ]}
                       onPress={() => handleStatusChange('watched')}
+                      activeOpacity={isLoading || collectionItem.status === 'watched' ? 1 : 0.7}
                     >
                       <Icon
                         name="checkmark-circle"
@@ -348,12 +372,13 @@ export const MediaDetailScreen: React.FC = () => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
+                      disabled={isLoading}
                       style={[
                         styles.statusButton,
-                        // collectionItem.status === 'watched' &&
-                        //   styles.statusButtonActive,
+                        isLoading && styles.statusButtonDisabled,
                       ]}
                       onPress={() => handleRemove()}
+                      activeOpacity={isLoading ? 1 : 0.7}
                     >
                       <Icon
                         name="trash-bin"
@@ -377,8 +402,13 @@ export const MediaDetailScreen: React.FC = () => {
 
                   <View style={styles.statusSection}>
                     <TouchableOpacity
-                      style={styles.statusButton}
+                      disabled={isLoading}
+                      style={[
+                        styles.statusButton,
+                        isLoading && styles.statusButtonDisabled,
+                      ]}
                       onPress={() => handleAddToCollection('will_watch')}
+                      activeOpacity={isLoading ? 1 : 0.7}
                     >
                       <Icon
                         name="bookmark"
@@ -391,8 +421,13 @@ export const MediaDetailScreen: React.FC = () => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      style={styles.statusButton}
+                      disabled={isLoading}
+                      style={[
+                        styles.statusButton,
+                        isLoading && styles.statusButtonDisabled,
+                      ]}
                       onPress={() => handleAddToCollection('watching')}
+                      activeOpacity={isLoading ? 1 : 0.7}
                     >
                       <Icon
                         name="play-circle"
@@ -405,8 +440,13 @@ export const MediaDetailScreen: React.FC = () => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      style={styles.statusButton}
+                      disabled={isLoading}
+                      style={[
+                        styles.statusButton,
+                        isLoading && styles.statusButtonDisabled,
+                      ]}
                       onPress={() => handleAddToCollection('watched')}
+                      activeOpacity={isLoading ? 1 : 0.7}
                     >
                       <Icon
                         name="checkmark-circle"
