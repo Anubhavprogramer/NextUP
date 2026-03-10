@@ -74,7 +74,7 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
         <View style={styles.emptyContainer}>
           <EmptyState
             icon="ticket-outline"
-            title="No Data found" 
+            title="No Media Found"
             message={''}
           />
         </View>

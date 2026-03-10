@@ -69,6 +69,11 @@ export interface MediaListProps {
   onRefresh?: () => void;
   loading?: boolean;
   emptyMessage?: string;
+
+  recentSearches?: string[];
+  onRecentSearchPress?: (query: string) => void;
+  onRemoveRecentSearch?: (query: string) => void;
+  onClearRecentSearches?: () => void;
 }
 
 export interface SearchBarProps {
@@ -174,7 +179,13 @@ export const STORAGE_KEYS = {
   COLLECTIONS: 'collections',
   THEME_PREFERENCE: 'theme_preference',
   IS_FIRST_LAUNCH: 'is_first_launch',
+  SEARCH_HISTORY_KEY:'search_history'
 } as const;
+
+export interface SearchHistoryItem {
+  query: string;
+  timestamp: number;
+}
 
 // Error types
 export interface AppError {
@@ -343,7 +354,8 @@ export type DataChangeEvent =
   | { type: 'ITEM_REMOVED'; payload: { itemId: string } }
   | { type: 'ITEM_UPDATED'; payload: { item: CollectionItem } }
   | { type: 'PROFILE_UPDATED'; payload: { profile: UserProfile } }
-  | { type: 'COLLECTION_CLEARED'; payload: { status: CollectionStatus } };
+  | { type: 'COLLECTION_CLEARED'; payload: { status: CollectionStatus } }
+  | { type: 'SEARCH_HISTORY_UPDATED'; payload: { history: SearchHistoryItem[] } }
 
 export interface DataChangeListener {
   (event: DataChangeEvent): void;

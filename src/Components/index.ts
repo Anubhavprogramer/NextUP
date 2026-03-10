@@ -9,6 +9,5 @@ export * from './Regular/CollectionSection';
 export * from './Regular/EmptyState';
 export * from './Regular/CustomHeader';
 export * from './Regular/StatCard';
-export * from './Regular/StatisticsCard';
 export * from './Regular/MetadataRow';
 export * from './Regular/StatusButton';
