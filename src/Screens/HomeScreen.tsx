@@ -268,7 +268,7 @@ export const HomeScreen: React.FC = () => {
               }}
             >
               <EmptyState
-                icon="bookmark-outline"
+                icon="ticket-outline"
                 title="Your Collection is Empty"
                 message="Start by searching for movies and TV shows to add to your collection."
                 buttonText="Search Movies & TV Shows"
