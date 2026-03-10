@@ -5,6 +5,7 @@ import { MediaCard } from './MediaCard';
 import { CollectionItem, CollectionStatus } from '../../Types';
 import { useTheme } from '../../Store/ThemeContext';
 import { DESIGN_CONSTANTS } from '../../Utils/constants';
+import { EmptyState } from './EmptyState';
 
 interface CollectionSectionProps {
   title: string;
@@ -71,9 +72,11 @@ export const CollectionSection: React.FC<CollectionSectionProps> = ({
           <ThemedText variant="subtitle" style={styles.sectionTitle}>{title}</ThemedText>
         </View>
         <View style={styles.emptyContainer}>
-          <ThemedText variant="body" style={styles.emptyText}>
-            No items in this collection yet
-          </ThemedText>
+          <EmptyState
+            icon="ticket-outline"
+            title="No Data found" 
+            message={''}
+          />
         </View>
       </View>
     );
