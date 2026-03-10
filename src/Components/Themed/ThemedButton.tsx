@@ -39,7 +39,7 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
     const variantStyle: any = {};
     switch (variant) {
       case 'primary':
-        variantStyle.backgroundColor = disabled ? theme.colors.textTertiary : theme.colors.primaryLight;
+        variantStyle.backgroundColor = disabled ? theme.colors.primaryLight : theme.colors.primaryDark;
         break;
       case 'secondary':
         variantStyle.backgroundColor = disabled ? theme.colors.textTertiary : theme.colors.secondary;
@@ -62,6 +62,7 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
 
     switch (variant) {
       case 'primary':
+          return theme.colors.white;
       case 'secondary':
         return theme.colors.textInverse;
       case 'outline':
