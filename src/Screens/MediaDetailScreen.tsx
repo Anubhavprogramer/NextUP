@@ -163,7 +163,7 @@ export const MediaDetailScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ThemedView style={styles.container}>
-        <CustomHeader title="Details" showBack={true} />
+        <CustomHeader title={mediaItem.title} showBack={true} />
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Poster Section */}
           <View style={styles.posterSection}>
@@ -187,9 +187,9 @@ export const MediaDetailScreen: React.FC = () => {
           <View style={styles.content}>
             {/* Basic Info */}
             <View style={styles.section}>
-              <ThemedText variant="title" style={{ textAlign: 'left', marginBottom: DESIGN_CONSTANTS.SPACING.medium, color: theme.colors.primaryDark, fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.title }}>
+              {/* <ThemedText variant="title" style={{ textAlign: 'left', marginBottom: DESIGN_CONSTANTS.SPACING.medium, color: theme.colors.primaryDark, fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.title }}>
                 {mediaItem.title}
-              </ThemedText>
+              </ThemedText> */}
 
               <View style={{ flexDirection: 'row', gap: DESIGN_CONSTANTS.SPACING.small}}>
                 <MetadataRow
