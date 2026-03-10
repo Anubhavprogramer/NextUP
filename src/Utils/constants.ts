@@ -200,8 +200,8 @@ export const DARK_THEME = {
 } as const;
 
 
-// Export theme type for TypeScript
-export type Theme = typeof LIGHT_THEME;
+// Export theme type for TypeScript - accepts both LIGHT and DARK themes
+export type Theme = typeof LIGHT_THEME | typeof DARK_THEME;
 
 // TMDB configuration
 export const TMDB_CONFIG = {
