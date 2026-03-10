@@ -110,7 +110,7 @@ export const MediaDetailScreen: React.FC = () => {
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
-      paddingTop: DESIGN_CONSTANTS.SPACING.medium,
+      // paddingTop: DESIGN_CONSTANTS.SPACING.small,
     },
     scrollContent: {
       paddingBottom: DESIGN_CONSTANTS.SPACING.large,
