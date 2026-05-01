@@ -295,3 +295,47 @@ export const calculateCollectionStats = (collections: {
 // Aliases for consistency with MediaCard component
 export const formatReleaseDate = formatYear;
 export const getImageUrl = getTMDBImageUrl;
+
+/**
+ * Validate Instagram reel URL format
+ */
+export const isValidInstagramReelUrl = (url: string): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  
+  const instagramReelPatterns = [
+    /instagram\.com\/reel\//i,
+    /instagram\.com\/p\//i,
+    /instagr\.am\/p\//i,
+    /instagram\.com\/tv\//i,
+  ];
+  
+  return instagramReelPatterns.some(pattern => pattern.test(url));
+};
+
+/**
+ * Extract reel ID from Instagram URL
+ */
+export const extractReelId = (url: string): string | null => {
+  if (!isValidInstagramReelUrl(url)) return null;
+  
+  try {
+    // Extract ID from patterns like /reel/ABC123/ or /p/ABC123/
+    const match = url.match(/\/(reel|p|tv)\/([^/?#]+)/);
+    return match ? match[2] : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Normalize Instagram reel URL
+ */
+export const normalizeInstagramUrl = (url: string): string => {
+  if (!url) return '';
+  
+  // Remove query parameters and fragments
+  const cleaned = url.split('?')[0].split('#')[0];
+  
+  // Ensure it ends without trailing slash for consistency
+  return cleaned.replace(/\/$/, '');
+};

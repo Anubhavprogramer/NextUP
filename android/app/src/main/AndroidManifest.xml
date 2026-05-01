@@ -21,6 +21,24 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
+        <!-- Share Intent Filter for Instagram Reels -->
+        <intent-filter>
+            <action android:name="android.intent.action.SEND" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:mimeType="text/*" />
+            <data android:mimeType="text/plain" />
+            <data android:mimeType="text/html" />
+        </intent-filter>
+        <!-- Deep Link Intent Filter -->
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="nextup" android:host="reel" />
+            <data android:scheme="nextup" android:host="media" />
+            <data android:scheme="https" android:host="nextupapp.com" android:pathPrefix="/reel" />
+            <data android:scheme="https" android:host="nextupapp.com" android:pathPrefix="/media" />
+        </intent-filter>
       </activity>
     </application>
 </manifest>

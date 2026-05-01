@@ -90,6 +90,10 @@ export type RootStackParamList = {
   MediaDetail: { mediaItem: MediaItem };
   Statistics: undefined;
   Settings: undefined;
+  ReelShare: {
+    reelUrl: string;
+    collectionStatus?: CollectionStatus;
+  };
 };
 
 // API response types

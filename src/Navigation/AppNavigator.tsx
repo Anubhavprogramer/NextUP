@@ -6,10 +6,12 @@ import { HomeScreen } from '../Screens/HomeScreen';
 import { SearchScreen } from '../Screens/SearchScreen';
 import { CollectionScreen } from '../Screens/CollectionScreen';
 import { MediaDetailScreen } from '../Screens/MediaDetailScreen';
+import { ReelShareScreen } from '../Screens/ReelShareScreen';
 import { LoadingScreen } from '../Screens/LoadingScreen';
 import { ErrorScreen } from '../Screens/ErrorScreen';
 import { useApp } from '../Store/AppContext';
 import { RootStackParamList } from '../Types';
+import { linking } from '../Utils/deepLinking';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -40,7 +42,7 @@ export const AppNavigator: React.FC = () => {
 
   // Show main app for existing users with navigation
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator
         initialRouteName="Main"
         screenOptions={{
@@ -69,6 +71,14 @@ export const AppNavigator: React.FC = () => {
           options={{
             headerShown: false,
             title: 'Media Details',
+          }}
+        />
+        <Stack.Screen 
+          name="ReelShare" 
+          component={ReelShareScreen}
+          options={{
+            headerShown: true,
+            title: 'Add from Instagram',
           }}
         />
       </Stack.Navigator>
