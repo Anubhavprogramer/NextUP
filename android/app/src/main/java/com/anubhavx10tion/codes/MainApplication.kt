@@ -1,4 +1,4 @@
-package com.nextup
+package com.anubhavx10tion.codes
 
 import android.app.Application
 import com.facebook.react.PackageList

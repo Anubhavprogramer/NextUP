@@ -1,4 +1,4 @@
-package com.nextup
+package com.anubhavx10tion.codes
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
