@@ -31,43 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     return true
   }
-
-  /**
-   * Handle deep links and URL schemes
-   */
-  func application(
-    _ app: UIApplication,
-    open url: URL,
-    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
-  ) -> Bool {
-    // Handle nextup:// scheme
-    if url.scheme?.hasPrefix("nextup") == true {
-      RCTLinkingManager.application(app, open: url, options: options)
-      return true
-    }
-    return false
-  }
-
-  /**
-   * Handle universal links
-   */
-  func application(
-    _ application: UIApplication,
-    continue userActivity: NSUserActivity,
-    restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
-  ) -> Bool {
-    if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
-      if let url = userActivity.webpageURL {
-        RCTLinkingManager.application(
-          application,
-          continue: userActivity,
-          restorationHandler: restorationHandler
-        )
-        return true
-      }
-    }
-    return false
-  }
 }
 
 class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {

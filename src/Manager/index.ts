@@ -2,4 +2,3 @@
 
 export * from './StorageManager';
 export * from './DataManager';
-export * from './ReelManager';
