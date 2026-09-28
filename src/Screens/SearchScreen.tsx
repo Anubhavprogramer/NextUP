@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { RouteProp, useRoute } from '@react-navigation/native';
 
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
@@ -11,7 +12,7 @@ import { dataManager } from '../Manager/DataManager';
 import { MediaList } from '../Components/Regular/MediaList';
 import { SearchHeader } from '../Components/Regular/SearchHeader';
 
-import { MediaItem, APIError, SearchHistoryItem, StorageError } from '../Types';
+import { MediaItem, APIError, SearchHistoryItem, StorageError, RootStackParamList } from '../Types';
 
 import { searchMulti } from '../API/tmdb';
 
@@ -27,7 +28,9 @@ export const SearchScreen: React.FC = () => {
   const [recentSearches, setRecentSearches] = useState<SearchHistoryItem[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [currentQuery, setCurrentQuery] = useState('');
+  // Pre-filled when coming from a reel import that found no match.
+  const initialQuery = useRoute<RouteProp<RootStackParamList, 'Search'>>().params?.initialQuery ?? '';
+  const [currentQuery, setCurrentQuery] = useState(initialQuery);
 
   const debouncedSearch = useDebounce(currentQuery, 600);
 
@@ -282,6 +285,7 @@ export const SearchScreen: React.FC = () => {
       <SearchHeader
         onSearch={handleSearch}
         placeholder="Search movies and TV shows..."
+        initialValue={initialQuery}
       />
 
       <View style={styles.content}>

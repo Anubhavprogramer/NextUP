@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/Store/ThemeContext';
 import { AppProvider } from './src/Store/AppContext';
 import { ToastProvider } from './src/Store/ToastContext';
+import { ShareIntentProvider } from './src/Store/ShareIntentContext';
 import { AppNavigator } from './src/Navigation/AppNavigator';
 import { logger } from './src/Utils/debugger';
 
@@ -22,7 +23,9 @@ function App() {
       <ThemeProvider>
         <AppProvider>
           <ToastProvider>
-            <AppContent />
+            <ShareIntentProvider>
+              <AppContent />
+            </ShareIntentProvider>
           </ToastProvider>
         </AppProvider>
       </ThemeProvider>

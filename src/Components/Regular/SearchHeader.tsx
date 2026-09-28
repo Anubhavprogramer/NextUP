@@ -16,16 +16,18 @@ export interface SearchHeaderProps {
   onSearch: (query: string) => void;
   placeholder?: string;
   debounceMs?: number;
+  initialValue?: string;
 }
 
 export const SearchHeader: React.FC<SearchHeaderProps> = ({
   onSearch,
   placeholder = 'Search movies and TV shows...',
   // debounceMs = 300,
+  initialValue = '',
 }) => {
   const { theme } = useTheme();
   const navigation = useNavigation();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialValue);
 
   const handleClear = useCallback(() => {
     setQuery('');

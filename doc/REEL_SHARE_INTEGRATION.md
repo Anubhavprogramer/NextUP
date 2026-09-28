@@ -80,3 +80,34 @@ Use a `navigationRef` (`createNavigationContainerRef`) so navigation can happen 
 | Share a non-reel link | Toast "That doesn't look like a reel link" |
 | Airplane mode → share | "You're offline" + Retry |
 | Share the same reel twice | The second time shows "Already in Want to Watch" |
+
+---
+
+## Implemented (branch `feat/reel-import`, 2026-09-29)
+
+It ships as one path on both platforms, which replaces the custom-TurboModule plan above:
+
+```
+iOS:     Instagram → Share → NextUPShare.appex ──opens──▶ nextup://import?url=<text>
+Android: Instagram → Share → MainActivity rewrites ACTION_SEND ─▶ nextup://import?url=<text>
+                                         │
+                      React Native Linking (getInitialURL + 'url' events)
+                                         ▼
+      ShareIntentProvider (holds pendingShare) → AppNavigator navigates once the
+      stack is mounted and onboarding is done → ReelImportScreen → POST /api/reels/resolve
+```
+
+| Piece | File |
+|---|---|
+| iOS share extension (no App Group, so it works with a free Apple ID) | `ios/NextUPShare/ShareViewController.swift`, `ios/NextUPShare/Info.plist` |
+| URL scheme + forwarding to Linking | `ios/NextUP/Info.plist` (`CFBundleURLTypes`), `ios/NextUP/AppDelegate.swift` |
+| Android share → import link | `android/.../MainActivity.kt`, `AndroidManifest.xml` (SEND + `nextup://import`) |
+| Link parsing | `src/Utils/reelLinks.ts` |
+| Backend client | `src/API/reels.ts`, config in `src/Config/env.ts` |
+| Pending share hand-off | `src/Store/ShareIntentContext.tsx`, `src/Navigation/AppNavigator.tsx` |
+| Import UI | `src/Screens/ReelImportScreen.tsx` (candidates, "already in" state, list picker, fallbacks) |
+| Manual-search fallback | `Search` route takes `initialQuery` |
+
+**How the extension opens the app:** extensions can't call `UIApplication.shared.open`, so the extension walks the responder chain to `UIApplication` and calls `open(_:options:completionHandler:)` at runtime. This is widely used, but Apple doesn't document it. If a future iOS blocks it, the fallback is an App Group (needs a paid account) or a "copy link, then open NextUP" flow.
+
+**Verified:** the iOS app + extension build, sign and install on a device. Android `MainActivity` compiles. JS tests cover link parsing and the API client. **Not yet verified:** the on-device share flow, and live Instagram parsing on the backend.
