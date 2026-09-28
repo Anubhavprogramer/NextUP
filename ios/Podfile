@@ -38,6 +38,11 @@ target 'NextUP' do
         if build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < min_ios_version_supported.to_f
           build_config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min_ios_version_supported
         end
+        # fmt 11.0.2 fails to compile its consteval format checks with the
+        # Xcode 26+ clang in C++20 mode; C++17 turns consteval off for fmt only.
+        if target.name == 'fmt'
+          build_config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        end
       end
     end
   end
