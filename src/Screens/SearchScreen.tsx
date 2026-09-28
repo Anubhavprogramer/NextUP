@@ -11,7 +11,7 @@ import { dataManager } from '../Manager/DataManager';
 import { MediaList } from '../Components/Regular/MediaList';
 import { SearchHeader } from '../Components/Regular/SearchHeader';
 
-import { MediaItem, APIError, SearchHistoryItem } from '../Types';
+import { MediaItem, APIError, SearchHistoryItem, StorageError } from '../Types';
 
 import { searchMulti } from '../API/tmdb';
 
@@ -214,10 +214,14 @@ export const SearchScreen: React.FC = () => {
 
         console.error('Add to collection error:', error);
 
-        showError('Unable to add to collection');
+        if (error instanceof StorageError && error.code === 'DUPLICATE_ITEM') {
+          showInfo('Already in your collection');
+        } else {
+          showError('Unable to add to collection');
+        }
       }
     },
-    [addToCollection, showSuccess, showError],
+    [addToCollection, showSuccess, showError, showInfo],
   );
 
   // ===============================

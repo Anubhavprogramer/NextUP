@@ -15,7 +15,7 @@ import { ThemedText } from '../Components/Themed/ThemedText';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
-import { RootStackParamList, CollectionStatus } from '../Types';
+import { RootStackParamList, CollectionStatus, StorageError } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { formatReleaseDate, getTMDBImageUrl } from '../Utils/helpers';
 import { CustomHeader, MetadataRow, StatusButton } from '../Components';
@@ -36,7 +36,7 @@ export const MediaDetailScreen: React.FC = () => {
     updateItemStatus,
     removeFromCollection,
   } = useApp();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError, showInfo } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const { mediaItem } = route.params;
@@ -64,7 +64,11 @@ export const MediaDetailScreen: React.FC = () => {
       const statusLabel = status.replace('_', ' ');
       showSuccess(`Added to ${statusLabel}`);
     } catch (error) {
-      showError('Failed to add to collection');
+      if (error instanceof StorageError && error.code === 'DUPLICATE_ITEM') {
+        showInfo('Already in your collection');
+      } else {
+        showError('Failed to add to collection');
+      }
     } finally {
       setIsLoading(false);
     }
