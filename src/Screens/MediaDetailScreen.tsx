@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useRoute } from '@react-navigation/native';
@@ -16,11 +15,10 @@ import { ThemedText } from '../Components/Themed/ThemedText';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
-import { RootStackParamList, CollectionStatus } from '../Types';
+import { RootStackParamList, CollectionStatus, StorageError } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { formatReleaseDate, getTMDBImageUrl } from '../Utils/helpers';
-import { CustomHeader } from '../Components';
-import { Color } from 'react-native/types_generated/Libraries/Animated/AnimatedExports';
+import { CustomHeader, MetadataRow, StatusButton } from '../Components';
 
 type MediaDetailScreenRouteProp = RouteProp<RootStackParamList, 'MediaDetail'>;
 type MediaDetailScreenNavigationProp = NativeStackNavigationProp<
@@ -38,7 +36,8 @@ export const MediaDetailScreen: React.FC = () => {
     updateItemStatus,
     removeFromCollection,
   } = useApp();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError, showInfo } = useToast();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const { mediaItem } = route.params;
 
@@ -60,23 +59,33 @@ export const MediaDetailScreen: React.FC = () => {
 
   const handleAddToCollection = async (status: CollectionStatus) => {
     try {
+      setIsLoading(true);
       await addToCollection(mediaItem, status);
       const statusLabel = status.replace('_', ' ');
       showSuccess(`Added to ${statusLabel}`);
     } catch (error) {
-      showError('Failed to add to collection');
+      if (error instanceof StorageError && error.code === 'DUPLICATE_ITEM') {
+        showInfo('Already in your collection');
+      } else {
+        showError('Failed to add to collection');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleStatusChange = async (newStatus: CollectionStatus) => {
-    if (!collectionItem) return;
+    if (!collectionItem || collectionItem.status === newStatus) return;
 
     try {
+      setIsLoading(true);
       await updateItemStatus(collectionItem.id, newStatus);
       const statusLabel = newStatus.replace('_', ' ');
       showSuccess(`Moved to ${statusLabel}`);
     } catch (error) {
       showError('Failed to update status');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,11 +93,14 @@ export const MediaDetailScreen: React.FC = () => {
     if (!collectionItem) return;
 
     try {
+      setIsLoading(true);
       await removeFromCollection(collectionItem.id);
       showSuccess('Removed from collection');
       navigation.goBack();
     } catch (error) {
       showError('Failed to remove item');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -102,7 +114,7 @@ export const MediaDetailScreen: React.FC = () => {
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
-      paddingTop: DESIGN_CONSTANTS.SPACING.medium,
+      // paddingTop: DESIGN_CONSTANTS.SPACING.small,
     },
     scrollContent: {
       paddingBottom: DESIGN_CONSTANTS.SPACING.large,
@@ -137,45 +149,10 @@ export const MediaDetailScreen: React.FC = () => {
       marginBottom: DESIGN_CONSTANTS.SPACING.medium,
       color: theme.colors.primaryDark,
     },
-    metadataRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: DESIGN_CONSTANTS.SPACING.small,
-      backgroundColor: theme.colors.white,
-      padding: DESIGN_CONSTANTS.SPACING.small,
-      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.xlarge * 2,
-    },
-    metadataText: {
-      marginLeft: DESIGN_CONSTANTS.SPACING.small,
-      color: theme.colors.textSecondary,
-    },
     statusSection: {
       flexDirection: 'row',
       justifyContent: 'space-around',
       marginBottom: DESIGN_CONSTANTS.SPACING.medium,
-    },
-    statusButton: {
-      flex: 1,
-      marginHorizontal: DESIGN_CONSTANTS.SPACING.xsmall,
-      paddingVertical: DESIGN_CONSTANTS.SPACING.medium,
-      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
-      alignItems: 'center',
-      backgroundColor: theme.colors.background,
-      borderWidth: 2,
-      borderColor: theme.colors.primaryDark,
-    },
-    statusButtonActive: {
-      backgroundColor: theme.colors.primary,
-      borderColor: theme.colors.primary,
-    },
-    statusButtonText: {
-      fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.caption,
-      fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.medium,
-      marginTop: DESIGN_CONSTANTS.SPACING.xsmall,
-      color: theme.colors.text,
-    },
-    statusButtonTextActive: {
-      color: theme.colors.background,
     },
     removeButton: {
       backgroundColor: theme.colors.error,
@@ -190,7 +167,7 @@ export const MediaDetailScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ThemedView style={styles.container}>
-        <CustomHeader title="Details" showBack={true} />
+        <CustomHeader title={mediaItem.title} showBack={true} />
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Poster Section */}
           <View style={styles.posterSection}>
@@ -214,39 +191,25 @@ export const MediaDetailScreen: React.FC = () => {
           <View style={styles.content}>
             {/* Basic Info */}
             <View style={styles.section}>
-              <ThemedText variant="title" style={{ textAlign: 'left', marginBottom: DESIGN_CONSTANTS.SPACING.medium, color: theme.colors.primaryDark, fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.title }}>
+              {/* <ThemedText variant="title" style={{ textAlign: 'left', marginBottom: DESIGN_CONSTANTS.SPACING.medium, color: theme.colors.primaryDark, fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.title }}>
                 {mediaItem.title}
-              </ThemedText>
+              </ThemedText> */}
 
-              <View style={{ flexDirection: 'row', gap: DESIGN_CONSTANTS.SPACING.large}}>
-                <View style={styles.metadataRow}>
-                  <Icon
-                    name={mediaItem.mediaType === 'tv' ? 'tv' : 'film'}
-                    size={16}
-                    color={theme.colors.primaryDark}
-                  />
-                  <ThemedText variant="body" style={styles.metadataText}>
-                    {mediaItem.mediaType === 'tv' ? 'TV Show' : 'Movie'}
-                  </ThemedText>
-                </View>
+              <View style={{ flexDirection: 'row', gap: DESIGN_CONSTANTS.SPACING.small}}>
+                <MetadataRow
+                  iconName={mediaItem.mediaType === 'tv' ? 'tv' : 'film'}
+                  text={mediaItem.mediaType === 'tv' ? 'TV Show' : 'Movie'}
+                />
 
-                <View style={styles.metadataRow}>
-                  <Icon
-                    name="calendar-outline"
-                    size={16}
-                    color={theme.colors.primaryDark}
-                  />
-                  <ThemedText variant="body" style={styles.metadataText}>
-                    {formatReleaseDate(mediaItem.releaseDate)}
-                  </ThemedText>
-                </View>
+                <MetadataRow
+                  iconName="calendar-outline"
+                  text={formatReleaseDate(mediaItem.releaseDate)}
+                />
 
-                <View style={styles.metadataRow}>
-                  <Icon name="star" size={16} color={theme.colors.primaryDark} />
-                  <ThemedText variant="body" style={styles.metadataText}>
-                    {mediaItem.voteAverage.toFixed(1)}/10
-                  </ThemedText>
-                </View>
+                <MetadataRow
+                  iconName="star"
+                  text={`${mediaItem.voteAverage.toFixed(1)}/10`}
+                />
               </View>
             </View>
 
@@ -256,7 +219,7 @@ export const MediaDetailScreen: React.FC = () => {
                 <ThemedText variant="subtitle" style={styles.sectionTitle}>
                   Overview
                 </ThemedText>
-                <ThemedText variant="body" style={styles.metadataText}>{mediaItem.overview}</ThemedText>
+                <ThemedText variant="body">{mediaItem.overview}</ThemedText>
               </View>
             )}
 
@@ -290,77 +253,36 @@ export const MediaDetailScreen: React.FC = () => {
                   </ThemedText>
 
                   <View style={styles.statusSection}>
-                    <TouchableOpacity
-                      style={[
-                        styles.statusButton,
-                        collectionItem.status === 'will_watch' &&
-                          styles.statusButtonActive,
-                      ]}
+                    <StatusButton
+                      iconName="bookmark"
+                      status="will_watch"
+                      currentStatus={collectionItem.status}
+                      isLoading={isLoading}
                       onPress={() => handleStatusChange('will_watch')}
-                    >
-                      <Icon
-                        name="bookmark"
-                        size={20}
-                        color={
-                          collectionItem.status === 'will_watch'
-                            ? theme.colors.background
-                            : theme.colors.primary
-                        }
-                      />
-                    </TouchableOpacity>
+                    />
 
-                    <TouchableOpacity
-                      style={[
-                        styles.statusButton,
-                        collectionItem.status === 'watching' &&
-                          styles.statusButtonActive,
-                      ]}
+                    <StatusButton
+                      iconName="play-circle"
+                      status="watching"
+                      currentStatus={collectionItem.status}
+                      isLoading={isLoading}
                       onPress={() => handleStatusChange('watching')}
-                    >
-                      <Icon
-                        name="play-circle"
-                        size={20}
-                        color={
-                          collectionItem.status === 'watching'
-                            ? theme.colors.background
-                            : theme.colors.primary
-                        }
-                      />
-                    </TouchableOpacity>
+                    />
 
-                    <TouchableOpacity
-                      style={[
-                        styles.statusButton,
-                        collectionItem.status === 'watched' &&
-                          styles.statusButtonActive,
-                      ]}
+                    <StatusButton
+                      iconName="checkmark-circle"
+                      status="watched"
+                      currentStatus={collectionItem.status}
+                      isLoading={isLoading}
                       onPress={() => handleStatusChange('watched')}
-                    >
-                      <Icon
-                        name="checkmark-circle"
-                        size={20}
-                        color={
-                          collectionItem.status === 'watched'
-                            ? theme.colors.background
-                            : theme.colors.primary
-                        }
-                      />
-                    </TouchableOpacity>
+                    />
 
-                    <TouchableOpacity
-                      style={[
-                        styles.statusButton,
-                        // collectionItem.status === 'watched' &&
-                        //   styles.statusButtonActive,
-                      ]}
+                    <StatusButton
+                      iconName="trash-bin"
+                      status="watched"
+                      isLoading={isLoading}
                       onPress={() => handleRemove()}
-                    >
-                      <Icon
-                        name="trash-bin"
-                        size={20}
-                        color={theme.colors.primary}
-                      />
-                    </TouchableOpacity>
+                    />
                   </View>
                 </>
               ) : (
@@ -376,47 +298,32 @@ export const MediaDetailScreen: React.FC = () => {
                   </ThemedText>
 
                   <View style={styles.statusSection}>
-                    <TouchableOpacity
-                      style={styles.statusButton}
+                    <StatusButton
+                      iconName="bookmark"
+                      label="Want to Watch"
+                      status="will_watch"
+                      isLoading={isLoading}
                       onPress={() => handleAddToCollection('will_watch')}
-                    >
-                      <Icon
-                        name="bookmark"
-                        size={20}
-                        color={theme.colors.warning}
-                      />
-                      <ThemedText style={styles.statusButtonText}>
-                        Want to Watch
-                      </ThemedText>
-                    </TouchableOpacity>
+                      iconColor={theme.colors.warning}
+                    />
 
-                    <TouchableOpacity
-                      style={styles.statusButton}
+                    <StatusButton
+                      iconName="play-circle"
+                      label="Watching"
+                      status="watching"
+                      isLoading={isLoading}
                       onPress={() => handleAddToCollection('watching')}
-                    >
-                      <Icon
-                        name="play-circle"
-                        size={20}
-                        color={theme.colors.primary}
-                      />
-                      <ThemedText style={styles.statusButtonText}>
-                        Watching
-                      </ThemedText>
-                    </TouchableOpacity>
+                      iconColor={theme.colors.primary}
+                    />
 
-                    <TouchableOpacity
-                      style={styles.statusButton}
+                    <StatusButton
+                      iconName="checkmark-circle"
+                      label="Watched"
+                      status="watched"
+                      isLoading={isLoading}
                       onPress={() => handleAddToCollection('watched')}
-                    >
-                      <Icon
-                        name="checkmark-circle"
-                        size={20}
-                        color={theme.colors.success}
-                      />
-                      <ThemedText style={styles.statusButtonText}>
-                        Watched
-                      </ThemedText>
-                    </TouchableOpacity>
+                      iconColor={theme.colors.success}
+                    />
                   </View>
                 </>
               )}

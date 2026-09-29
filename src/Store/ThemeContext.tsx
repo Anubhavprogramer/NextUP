@@ -3,6 +3,7 @@ import { Appearance, ColorSchemeName } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LIGHT_THEME, DARK_THEME, Theme } from '../Utils/constants';
 import { ThemePreference, STORAGE_KEYS } from '../Types';
+import { logger } from '../Utils/debugger';
 
 interface ThemeContextType {
   theme: Theme;
@@ -33,19 +34,41 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   const effectiveTheme = getEffectiveTheme();
-  const theme = effectiveTheme === 'dark' ? DARK_THEME : LIGHT_THEME;
+  const theme = (effectiveTheme === 'dark' ? DARK_THEME : LIGHT_THEME) as Theme;
   const isDark = effectiveTheme === 'dark';
+
+  // Safety check
+  if (!theme || !theme.colors) {
+    logger.error('ThemeProvider', 'Theme object is invalid', {
+      effectiveTheme,
+      hasTheme: !!theme,
+      hasColors: !!theme?.colors,
+    });
+  }
 
   // Load theme preference from storage on mount
   useEffect(() => {
+    try {
+      logger.info('ThemeProvider', 'Initializing theme provider', { 
+        themePreference: 'system',
+        systemTheme: Appearance.getColorScheme() 
+      });
+    } catch (error) {
+      logger.error('ThemeProvider', 'Error in initialization logging', error);
+    }
+
     const loadThemePreference = async () => {
       try {
+        logger.debug('ThemeProvider', 'Loading theme preference from storage');
         const savedPreference = await AsyncStorage.getItem(STORAGE_KEYS.THEME_PREFERENCE);
+        logger.debug('ThemeProvider', 'Loaded theme preference', { savedPreference });
+        
         if (savedPreference && ['light', 'dark', 'system'].includes(savedPreference)) {
           setThemePreferenceState(savedPreference as ThemePreference);
+          logger.info('ThemeProvider', 'Theme preference loaded', { preference: savedPreference });
         }
       } catch (error) {
-        console.warn('Failed to load theme preference:', error);
+        logger.error('ThemeProvider', 'Failed to load theme preference', error);
       }
     };
 
@@ -54,31 +77,57 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // Listen to system theme changes
   useEffect(() => {
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      setSystemTheme(colorScheme);
-    });
+    try {
+      logger.debug('ThemeProvider', 'Setting up system theme listener');
+      const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+        logger.debug('ThemeProvider', 'System theme changed', { colorScheme });
+        try {
+          setSystemTheme(colorScheme);
+          logger.info('ThemeProvider', 'System theme updated', { colorScheme });
+        } catch (error) {
+          logger.error('ThemeProvider', 'Error updating system theme', error);
+        }
+      });
 
-    return () => subscription?.remove();
+      return () => {
+        try {
+          subscription?.remove();
+          logger.debug('ThemeProvider', 'System theme listener removed');
+        } catch (error) {
+          logger.error('ThemeProvider', 'Error removing theme listener', error);
+        }
+      };
+    } catch (error) {
+      logger.error('ThemeProvider', 'Failed to set up system theme listener', error);
+      return undefined;
+    }
   }, []);
 
   // Save theme preference to storage
   const setThemePreference = async (preference: ThemePreference) => {
     try {
+      logger.debug('ThemeProvider', 'Setting theme preference', { preference });
       setThemePreferenceState(preference);
       await AsyncStorage.setItem(STORAGE_KEYS.THEME_PREFERENCE, preference);
+      logger.info('ThemeProvider', 'Theme preference saved', { preference });
     } catch (error) {
-      console.warn('Failed to save theme preference:', error);
+      logger.error('ThemeProvider', 'Failed to save theme preference', { preference, error });
     }
   };
 
   // Toggle between light and dark (ignores system preference)
   const toggleTheme = () => {
-    const newPreference = effectiveTheme === 'dark' ? 'light' : 'dark';
-    setThemePreference(newPreference);
+    try {
+      const newPreference = effectiveTheme === 'dark' ? 'light' : 'dark';
+      logger.debug('ThemeProvider', 'Toggling theme', { from: effectiveTheme, to: newPreference });
+      setThemePreference(newPreference);
+    } catch (error) {
+      logger.error('ThemeProvider', 'Failed to toggle theme', error);
+    }
   };
 
   const contextValue: ThemeContextType = {
-    theme,
+    theme: theme as Theme,
     themePreference,
     isDark,
     setThemePreference,

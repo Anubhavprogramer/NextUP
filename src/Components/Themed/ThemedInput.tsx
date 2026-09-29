@@ -42,7 +42,8 @@ export const ThemedInput: React.FC<ThemedInputProps> = ({
     styles.input,
     {
       backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.background,
+      borderColor: theme.colors.primaryDark,
+      borderWidth: isFocused ? 2 : 1,
       color: theme.colors.text
     },
     style,
@@ -62,7 +63,7 @@ export const ThemedInput: React.FC<ThemedInputProps> = ({
         onBlur={handleBlur}
         {...otherProps}
       />
-      <View style={{ height: 3, backgroundColor: theme.colors.primary, borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.small }} />
+      {/* <View style={{ height: 3, backgroundColor: theme.colors.primary, borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.small }} /> */}
       {error && (
         <ThemedText
           variant="caption"
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
   input: {
     height: DESIGN_CONSTANTS.INPUT_HEIGHT,
     borderWidth: 1,
-    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
+    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.xlarge,
     paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
     fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body,
   },

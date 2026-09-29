@@ -1,165 +1,299 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { RouteProp, useRoute } from '@react-navigation/native';
+
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
-import { SearchBar } from '../Components/Regular/SearchBar';
+import { useDialog } from '../Store/DialogContext';
+import { collectionStatusActions } from '../Utils/collectionActions';
+
+import { dataManager } from '../Manager/DataManager';
+
 import { MediaList } from '../Components/Regular/MediaList';
 import { SearchHeader } from '../Components/Regular/SearchHeader';
-import { CustomHeader } from '../Components/Regular/CustomHeader';
-import { MediaItem, APIError } from '../Types';
-import { searchMulti, testTMDBConnection } from '../API/tmdb';
-import { runFullDebug } from '../API/debug';
+
+import { MediaItem, APIError, SearchHistoryItem, StorageError, RootStackParamList } from '../Types';
+
+import { searchMulti } from '../API/tmdb';
+
 import { DESIGN_CONSTANTS } from '../Utils';
+import { useDebounce } from '../Store/hooks';
 
 export const SearchScreen: React.FC = () => {
   const { theme } = useTheme();
   const { addToCollection, findItemByMediaId } = useApp();
   const { showSuccess, showError, showInfo } = useToast();
-  const [searchResults, setSearchResults] = useState<MediaItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [currentQuery, setCurrentQuery] = useState('');
+  const { showActionSheet } = useDialog();
 
-  // Test API connection on component mount
+  const [searchResults, setSearchResults] = useState<MediaItem[]>([]);
+  const [recentSearches, setRecentSearches] = useState<SearchHistoryItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Pre-filled when coming from a reel import that found no match.
+  const initialQuery = useRoute<RouteProp<RootStackParamList, 'Search'>>().params?.initialQuery ?? '';
+  const [currentQuery, setCurrentQuery] = useState(initialQuery);
+
+  const debouncedSearch = useDebounce(currentQuery, 600);
+
+  // ===============================
+  // Load Recent Searches on Mount
+  // ===============================
+
   useEffect(() => {
-    testTMDBConnection();
+    const loadRecentSearches = async () => {
+      const history = await dataManager.getRecentSearches();
+      setRecentSearches(history);
+    };
+
+    loadRecentSearches();
   }, []);
 
-  const handleSearch = useCallback(async (query: string) => {
-    setCurrentQuery(query);
-    
-    if (!query.trim()) {
-      setSearchResults([]);
-      setLoading(false);
-      return;
-    }
+  // ===============================
+  // Perform Search
+  // ===============================
 
-    setLoading(true);
-    
-    try {
-      const response = await searchMulti(query.trim());
-      
-      // Filter out person results and invalid items
-      const validResults = response.results.filter(item => 
-        item.mediaType === 'movie' || item.mediaType === 'tv'
-      );
-      
-      setSearchResults(validResults);
-    } catch (error) {
-      console.error('Search error:', error);
-      
-      let errorMessage = 'An unexpected error occurred. Please try again.';
-      
-      if (error instanceof APIError) {
-        if (error.code === 'NETWORK_ERROR') {
-          errorMessage = 'Network connection failed. Please check your internet connection and try again.';
-        } else if (error.code === 'TMDB_REQUEST_FAILED') {
-          errorMessage = `TMDB API error (${error.status}). Please try again later.`;
+  useEffect(() => {
+    const fetchSearch = async () => {
+      if (!debouncedSearch.trim()) {
+        setSearchResults([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const response = await searchMulti(debouncedSearch.trim());
+
+        const validResults = response.results.filter(
+          item => item.mediaType === 'movie' || item.mediaType === 'tv',
+        );
+
+        setSearchResults(validResults);
+
+        // Save successful search
+        if (validResults.length > 0) {
+          await dataManager.addRecentSearch(debouncedSearch.trim());
+
+          const history = await dataManager.getRecentSearches();
+          setRecentSearches(history);
+        }
+
+      } catch (error) {
+
+        console.error('Search error:', error);
+
+        let errorMessage = 'An unexpected error occurred. Please try again.';
+
+        if (error instanceof APIError) {
+
+          if (error.code === 'NETWORK_ERROR') {
+
+            errorMessage =
+              'Network connection failed. Please check your internet connection and try again.';
+
+          } else if (error.code === 'TMDB_REQUEST_FAILED') {
+
+            errorMessage =
+              `TMDB API error (${error.status}). Please try again later.`;
+
+          } else {
+
+            errorMessage =
+              'Unable to search at the moment. Please try again.';
+          }
+        }
+
+        showError(errorMessage);
+
+        setSearchResults([]);
+
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSearch();
+
+  }, [debouncedSearch]);
+
+  // ===============================
+  // Handle Search Input
+  // ===============================
+
+  const handleSearch = useCallback((query: string) => {
+    setCurrentQuery(query);
+  }, []);
+
+  // ===============================
+  // Remove One Recent Search
+  // ===============================
+
+  const handleRemoveSearch = useCallback(async (query: string) => {
+
+    await dataManager.removeRecentSearch(query);
+
+    const history = await dataManager.getRecentSearches();
+
+    setRecentSearches(history);
+
+  }, []);
+
+  // ===============================
+  // Clear All Recent Searches
+  // ===============================
+
+  const handleClearAll = useCallback(async () => {
+
+    await dataManager.clearRecentSearches();
+
+    setRecentSearches([]);
+
+  }, []);
+
+  // ===============================
+  // Add Item to Collection
+  // ===============================
+
+  const handleItemPress = useCallback(
+    (mediaItem: MediaItem) => {
+
+      const existingItem = findItemByMediaId(mediaItem.id);
+
+      if (existingItem) {
+
+        const statusLabel = existingItem.status.replace('_', ' ');
+
+        showInfo(`Already in ${statusLabel} collection`);
+
+        return;
+      }
+
+      showActionSheet({
+        media: mediaItem,
+        message: 'Add to your collection',
+        actions: collectionStatusActions(theme, status => handleAddToCollection(mediaItem, status)),
+      });
+    },
+    [findItemByMediaId, showInfo, showActionSheet, theme],
+  );
+
+  const handleAddToCollection = useCallback(
+    async (
+      mediaItem: MediaItem,
+      status: 'watched' | 'watching' | 'will_watch',
+    ) => {
+
+      try {
+
+        await addToCollection(mediaItem, status);
+
+        const statusName =
+          status === 'will_watch'
+            ? 'Want to Watch'
+            : status === 'watching'
+            ? 'Currently Watching'
+            : 'Watched';
+
+        showSuccess(`Added to ${statusName}`);
+
+      } catch (error) {
+
+        console.error('Add to collection error:', error);
+
+        if (error instanceof StorageError && error.code === 'DUPLICATE_ITEM') {
+          showInfo('Already in your collection');
         } else {
-          errorMessage = 'Unable to search at the moment. Please try again.';
+          showError('Unable to add to collection');
         }
       }
-      
-      showError(errorMessage);
-      
-      setSearchResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [addToCollection, showSuccess, showError, showInfo],
+  );
 
-  const handleItemPress = useCallback((mediaItem: MediaItem) => {
-    // Check if item is already in collection
-    const existingItem = findItemByMediaId(mediaItem.id);
-    
-    if (existingItem) {
-      const statusLabel = existingItem.status.replace('_', ' ');
-      showInfo(`Already in ${statusLabel} collection`);
-      return;
-    }
-
-    // Show collection selection
-    Alert.alert(
-      'Add to Collection',
-      `Add "${mediaItem.title}" to which collection?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Want to Watch',
-          onPress: () => handleAddToCollection(mediaItem, 'will_watch'),
-        },
-        {
-          text: 'Currently Watching',
-          onPress: () => handleAddToCollection(mediaItem, 'watching'),
-        },
-        {
-          text: 'Watched',
-          onPress: () => handleAddToCollection(mediaItem, 'watched'),
-        },
-      ]
-    );
-  }, [findItemByMediaId, showInfo]);
-
-  const handleAddToCollection = useCallback(async (
-    mediaItem: MediaItem, 
-    status: 'watched' | 'watching' | 'will_watch'
-  ) => {
-    try {
-      await addToCollection(mediaItem, status);
-      
-      const statusName = status === 'will_watch' ? 'Want to Watch' : 
-                        status === 'watching' ? 'Currently Watching' : 'Watched';
-      
-      showSuccess(`Added to ${statusName}`);
-    } catch (error) {
-      console.error('Add to collection error:', error);
-      showError('Unable to add to collection');
-    }
-  }, [addToCollection, showSuccess, showError]);
+  // ===============================
+  // Pull To Refresh
+  // ===============================
 
   const handleRefresh = useCallback(() => {
+
     if (currentQuery) {
       handleSearch(currentQuery);
     }
+
   }, [currentQuery, handleSearch]);
 
+  // ===============================
+  // Empty Message
+  // ===============================
+
   const getEmptyMessage = () => {
+
     if (!currentQuery) {
       return 'Search for movies and TV shows to add to your collection';
     }
+
     return `No results found for "${currentQuery}"`;
   };
 
+  // ===============================
+  // Styles
+  // ===============================
+
   const styles = StyleSheet.create({
+
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
     },
+
     content: {
       flex: 1,
       paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
       paddingVertical: DESIGN_CONSTANTS.SPACING.small,
     },
+
   });
 
+  // ===============================
+  // UI
+  // ===============================
+
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
+
+    <SafeAreaView
+      style={styles.container}
+      edges={['top', 'left', 'right', 'bottom']}
+    >
+
       <SearchHeader
         onSearch={handleSearch}
         placeholder="Search movies and TV shows..."
-        debounceMs={300}
+        initialValue={initialQuery}
       />
-      
+
       <View style={styles.content}>
+
         <MediaList
           data={searchResults}
+          loading={loading}
           onItemPress={handleItemPress}
           onRefresh={handleRefresh}
-          loading={loading}
           emptyMessage={getEmptyMessage()}
+
+          recentSearches={recentSearches.map(item => item.query)}
+
+          onRecentSearchPress={handleSearch}
+
+          onRemoveRecentSearch={handleRemoveSearch}
+
+          onClearRecentSearches={handleClearAll}
         />
+
       </View>
+
     </SafeAreaView>
   );
 };

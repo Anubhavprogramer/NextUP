@@ -13,9 +13,10 @@ import {
   isUserProfile,
   isCollectionItem,
   ValidationResult,
-  VALIDATION_CONSTANTS
+  VALIDATION_CONSTANTS,
+  SearchHistoryItem
 } from '../Types';
-import { storageManager } from './StorageManager';
+import { LocalStorageManager, storageManager } from './StorageManager';
 import { 
   generateId, 
   createCollectionItem, 
@@ -188,6 +189,7 @@ export class DataManager implements CollectionOperations {
         payload: { profile: profile! },
       });
     } catch (error) {
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to save user profile: ${error}`,
         'SAVE_PROFILE_ERROR'
@@ -337,6 +339,8 @@ export class DataManager implements CollectionOperations {
 
       return newItem;
     } catch (error) {
+      // Keep specific codes (e.g. DUPLICATE_ITEM, ITEM_NOT_FOUND) intact for callers
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to add item to collection: ${error}`,
         'ADD_ITEM_ERROR'
@@ -373,6 +377,7 @@ export class DataManager implements CollectionOperations {
         payload: { itemId },
       });
     } catch (error) {
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to remove item: ${error}`,
         'REMOVE_ITEM_ERROR'
@@ -414,6 +419,7 @@ export class DataManager implements CollectionOperations {
 
       return updatedItem;
     } catch (error) {
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to update item status: ${error}`,
         'UPDATE_STATUS_ERROR'
@@ -570,6 +576,7 @@ export class DataManager implements CollectionOperations {
 
       return updatedItem;
     } catch (error) {
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to update item field: ${error}`,
         'UPDATE_FIELD_ERROR'
@@ -600,6 +607,97 @@ export class DataManager implements CollectionOperations {
       errors,
     };
   }
+
+  async getRecentSearches(): Promise<SearchHistoryItem[]> {
+    try {
+      const history = await storageManager.get<SearchHistoryItem[]>(
+        STORAGE_KEYS.SEARCH_HISTORY_KEY
+      );
+
+      if (!history) return [];
+
+      return history.sort((a, b) => b.timestamp - a.timestamp);
+    } catch (error) {
+      console.warn('Failed to get recent searches:', error);
+      return [];
+    }
+  }
+
+  async addRecentSearch(query: string): Promise<void> {
+    try {
+      const trimmedQuery = query.trim();
+
+      if (!trimmedQuery) return;
+
+      const history = await this.getRecentSearches();
+
+      // remove duplicate
+      const filtered = history.filter(
+        item => item.query.toLowerCase() !== trimmedQuery.toLowerCase()
+      );
+
+      const newItem: SearchHistoryItem = {
+        query: trimmedQuery,
+        timestamp: Date.now(),
+      };
+
+      const updatedHistory = [newItem, ...filtered].slice(0, 10); // keep max 10
+
+      await storageManager.set(STORAGE_KEYS.SEARCH_HISTORY_KEY, updatedHistory);
+
+      this.emitChange({
+        type: 'SEARCH_HISTORY_UPDATED',
+        payload: { history: updatedHistory },
+      });
+
+    } catch (error) {
+      throw new StorageError(
+        `Failed to add recent search: ${error}`,
+        'ADD_SEARCH_ERROR'
+      );
+    }
+  }
+
+  async removeRecentSearch(query: string): Promise<void> {
+    try {
+      const history = await this.getRecentSearches();
+
+      const updatedHistory = history.filter(
+        item => item.query !== query
+      );
+
+      await storageManager.set(STORAGE_KEYS.SEARCH_HISTORY_KEY, updatedHistory);
+
+      this.emitChange({
+        type: 'SEARCH_HISTORY_UPDATED',
+        payload: { history: updatedHistory },
+      });
+
+    } catch (error) {
+      throw new StorageError(
+        `Failed to remove recent search: ${error}`,
+        'REMOVE_SEARCH_ERROR'
+      );
+    }
+  }
+
+  async clearRecentSearches(): Promise<void> {
+    try {
+      await storageManager.remove(STORAGE_KEYS.SEARCH_HISTORY_KEY);
+
+      this.emitChange({
+        type: 'SEARCH_HISTORY_UPDATED',
+        payload: { history: [] },
+      });
+
+    } catch (error) {
+      throw new StorageError(
+        `Failed to clear recent searches: ${error}`,
+        'CLEAR_SEARCH_HISTORY_ERROR'
+      );
+    }
+  }
+
 }
 
 // Export singleton instance

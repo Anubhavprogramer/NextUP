@@ -1,21 +1,40 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ProfileSetupScreen } from '../Screens/ProfileSetupScreen';
 import { HomeScreen } from '../Screens/HomeScreen';
 import { SearchScreen } from '../Screens/SearchScreen';
 import { CollectionScreen } from '../Screens/CollectionScreen';
 import { MediaDetailScreen } from '../Screens/MediaDetailScreen';
-import { StatisticsScreen } from '../Screens/StatisticsScreen';
+import { ReelImportScreen } from '../Screens/ReelImportScreen';
 import { LoadingScreen } from '../Screens/LoadingScreen';
 import { ErrorScreen } from '../Screens/ErrorScreen';
 import { useApp } from '../Store/AppContext';
+import { useShareIntent } from '../Store/ShareIntentContext';
 import { RootStackParamList } from '../Types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 export const AppNavigator: React.FC = () => {
   const { loading, error, isFirstLaunch, userProfile, refreshAppState } = useApp();
+  const { pendingShare, clearPendingShare } = useShareIntent();
+  const [navigationReady, setNavigationReady] = useState(false);
+
+  const showMainApp = !loading && !error && !isFirstLaunch && !!userProfile;
+
+  // The container unmounts whenever a gate screen shows, so readiness resets.
+  useEffect(() => {
+    if (!showMainApp) setNavigationReady(false);
+  }, [showMainApp]);
+
+  // Open shared reels once the main stack exists (after loading/onboarding).
+  useEffect(() => {
+    if (showMainApp && navigationReady && pendingShare && navigationRef.isReady()) {
+      navigationRef.navigate('ReelImport', { sharedText: pendingShare });
+      clearPendingShare();
+    }
+  }, [showMainApp, navigationReady, pendingShare, clearPendingShare]);
 
   // Show loading screen while app state is loading
   if (loading) {
@@ -41,7 +60,7 @@ export const AppNavigator: React.FC = () => {
 
   // Show main app for existing users with navigation
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef} onReady={() => setNavigationReady(true)}>
       <Stack.Navigator
         initialRouteName="Main"
         screenOptions={{
@@ -55,7 +74,6 @@ export const AppNavigator: React.FC = () => {
           options={{
             headerShown: false,
             title: 'Search Movies & TV Shows',
-            headerBackTitleVisible: false,
           }}
         />
         <Stack.Screen 
@@ -63,24 +81,15 @@ export const AppNavigator: React.FC = () => {
           component={CollectionScreen}
           options={{
             headerShown: false,
-            headerBackTitleVisible: false,
           }}
         />
+        <Stack.Screen name="ReelImport" component={ReelImportScreen} />
         <Stack.Screen 
           name="MediaDetail" 
           component={MediaDetailScreen}
           options={{
             headerShown: false,
-            headerBackTitleVisible: false,
             title: 'Media Details',
-          }}
-        />
-        <Stack.Screen 
-          name="Statistics" 
-          component={StatisticsScreen}
-          options={{
-            headerShown: false,
-            title: 'Statistics',
           }}
         />
       </Stack.Navigator>
