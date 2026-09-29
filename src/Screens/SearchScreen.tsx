@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useRoute } from '@react-navigation/native';
 
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
+import { useDialog } from '../Store/DialogContext';
+import { collectionStatusActions } from '../Utils/collectionActions';
 
 import { dataManager } from '../Manager/DataManager';
 
@@ -23,6 +25,7 @@ export const SearchScreen: React.FC = () => {
   const { theme } = useTheme();
   const { addToCollection, findItemByMediaId } = useApp();
   const { showSuccess, showError, showInfo } = useToast();
+  const { showActionSheet } = useDialog();
 
   const [searchResults, setSearchResults] = useState<MediaItem[]>([]);
   const [recentSearches, setRecentSearches] = useState<SearchHistoryItem[]>([]);
@@ -168,30 +171,13 @@ export const SearchScreen: React.FC = () => {
         return;
       }
 
-      Alert.alert(
-        'Add to Collection',
-        `Add "${mediaItem.title}" to which collection?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-
-          {
-            text: 'Want to Watch',
-            onPress: () => handleAddToCollection(mediaItem, 'will_watch'),
-          },
-
-          {
-            text: 'Currently Watching',
-            onPress: () => handleAddToCollection(mediaItem, 'watching'),
-          },
-
-          {
-            text: 'Watched',
-            onPress: () => handleAddToCollection(mediaItem, 'watched'),
-          },
-        ],
-      );
+      showActionSheet({
+        media: mediaItem,
+        message: 'Add to your collection',
+        actions: collectionStatusActions(theme, status => handleAddToCollection(mediaItem, status)),
+      });
     },
-    [findItemByMediaId, showInfo],
+    [findItemByMediaId, showInfo, showActionSheet, theme],
   );
 
   const handleAddToCollection = useCallback(

@@ -10,6 +10,7 @@ import { ThemeProvider, useTheme } from './src/Store/ThemeContext';
 import { AppProvider } from './src/Store/AppContext';
 import { ToastProvider } from './src/Store/ToastContext';
 import { ShareIntentProvider } from './src/Store/ShareIntentContext';
+import { DialogProvider } from './src/Store/DialogContext';
 import { AppNavigator } from './src/Navigation/AppNavigator';
 import { logger } from './src/Utils/debugger';
 
@@ -23,9 +24,11 @@ function App() {
       <ThemeProvider>
         <AppProvider>
           <ToastProvider>
-            <ShareIntentProvider>
-              <AppContent />
-            </ShareIntentProvider>
+            <DialogProvider>
+              <ShareIntentProvider>
+                <AppContent />
+              </ShareIntentProvider>
+            </DialogProvider>
           </ToastProvider>
         </AppProvider>
       </ThemeProvider>
