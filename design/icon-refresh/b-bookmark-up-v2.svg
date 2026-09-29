@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- B · Bookmark Up v2: notch and chevron both at 45°, gap = chevron thickness, consistent corner radii. -->
+  <path fill="#000" fill-rule="evenodd" d="
+    M86 36 H170 A18 18 0 0 1 188 54 V222 L128 162 L68 222 V54 A18 18 0 0 1 86 36 Z
+    M128 74 L178 124 L156 146 L128 118 L100 146 L78 124 Z"/>
+</svg>

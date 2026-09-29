@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- B · Bookmark Up: a bookmark whose tail notch is an up-arrow, echoed by a knocked-out chevron above it. -->
+  <path fill="#000" fill-rule="evenodd" d="
+    M84 36 H172 Q188 36 188 52 V222 L128 176 L68 222 V52 Q68 36 84 36 Z
+    M128 88 L178 138 L156 160 L128 132 L100 160 L78 138 Z"/>
+</svg>

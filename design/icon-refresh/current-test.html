@@ -1,0 +1,44 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1600px;background:#f4f1ee;font:600 15px -apple-system,system-ui,sans-serif;color:#333;padding:28px}
+h2{font-size:18px;margin:18px 0 10px}
+.row{display:flex;gap:26px;align-items:flex-end;flex-wrap:wrap}
+.cell{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#666}
+img{display:block}
+.wall{display:flex;gap:40px;padding:28px 36px;border-radius:24px;align-items:center}
+.wall.dark{background:linear-gradient(135deg,#1d2b3a,#3b2a4a)}
+.wall.light{background:linear-gradient(135deg,#dfe9f3,#f7efe6)}
+.wall .cell{color:#fff}
+.wall.light .cell{color:#333}
+.circle{border-radius:50%;overflow:hidden}
+.squircle{border-radius:32%;overflow:hidden}
+.legacy{border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gray{filter:grayscale(1)}
+.blur{filter:blur(3px)}
+</style></head><body>
+<h2>Sizes (true pixels): Play listing 512 · launcher 192/144 · 96 · 48 · 32 · 24</h2>
+<div class="row">
+ <div class="cell"><img src="current.png" width="512" height="512" style="border-radius:20%">512</div>
+ <div class="cell"><img src="current.png" width="192" height="192" class="circle">192</div>
+ <div class="cell"><img src="current.png" width="144" height="144" class="circle">144</div>
+ <div class="cell"><img src="current.png" width="96" height="96" class="circle">96</div>
+ <div class="cell"><img src="current.png" width="48" height="48" class="circle">48</div>
+ <div class="cell"><img src="current.png" width="32" height="32" class="circle">32</div>
+ <div class="cell"><img src="current.png" width="24" height="24" class="circle">24</div>
+</div>
+<h2>How Android shows it today (no adaptive icon → legacy icon shrunk into a white circle) vs. an adaptive mask</h2>
+<div class="row">
+ <div class="wall dark">
+  <div class="cell"><div class="legacy" style="width:112px;height:112px"><img src="current.png" width="80" height="80" style="border-radius:14px"></div>Legacy (today)</div>
+  <div class="cell"><img src="current.png" width="112" height="112" class="circle">Circle mask</div>
+  <div class="cell"><img src="current.png" width="112" height="112" class="squircle">Squircle mask</div>
+  <div class="cell"><img src="current.png" width="112" height="112" class="circle gray">Greyscale</div>
+  <div class="cell"><img src="current.png" width="112" height="112" class="circle blur">Squint</div>
+ </div>
+ <div class="wall light">
+  <div class="cell"><div class="legacy" style="width:112px;height:112px;box-shadow:0 1px 4px rgba(0,0,0,.2)"><img src="current.png" width="80" height="80" style="border-radius:14px"></div>Legacy (today)</div>
+  <div class="cell"><img src="current.png" width="112" height="112" class="circle">Circle mask</div>
+  <div class="cell"><img src="current.png" width="56" height="56" class="circle">56 px</div>
+ </div>
+</div>
+</body></html>
