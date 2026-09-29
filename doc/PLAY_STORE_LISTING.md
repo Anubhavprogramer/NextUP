@@ -1,6 +1,6 @@
 # Google Play — Listing & Console Answers
 
-Everything to paste into Play Console for **NextUP: Watchlist from Reels** (`com.anubhavx10tion.nextup`). The answers below reflect what the code actually does (see `doc/ARCHITECTURE.md`); update them if features change.
+Everything to paste into Play Console for **NextUP: Watchlist from Reels** (`com.anubhavx10tion.codes`, the permanent Play package name). The answers below reflect what the code actually does (see `doc/ARCHITECTURE.md`); update them if features change.
 
 ## Main store listing
 

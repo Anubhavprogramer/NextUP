@@ -68,7 +68,7 @@ The Android sheet runs in NextUP's own process and JS runtime, so it uses the sa
 ```sh
 adb shell am start -a android.intent.action.SEND -t text/plain \
   --es android.intent.extra.TEXT "https://www.instagram.com/reel/<id>/" \
-  com.anubhavx10tion.nextup/.ShareActivity
+  com.anubhavx10tion.codes/com.anubhavx10tion.nextup.ShareActivity
 ```
 
 **Status:** iOS confirmed working on an iPhone 16 (iOS 26.6.1) by the user on 2026-09-29. Android compiles but hasn't been run on a device yet. How accurate the matching is on real reels hasn't been measured (see PRD §6.1).

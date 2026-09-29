@@ -60,7 +60,7 @@ npx tsc --noEmit    # currently 12 errors that were already there (AUDIT A-8); n
 
 | Field | Value | Where |
 |---|---|---|
-| Android `applicationId` | `com.anubhavx10tion.nextup` | `android/app/build.gradle` |
+| Android `applicationId` (Play package, permanent) | `com.anubhavx10tion.codes` | `android/app/build.gradle` — the Kotlin `namespace`/package stays `com.anubhavx10tion.nextup`; bump `versionCode` on every upload |
 | iOS bundle id | `com.anubhavx10tion.nextup` | Xcode target NextUP |
 | iOS share extension | `com.anubhavx10tion.nextup.share` | Xcode target NextUPShare |
 | Version | `1.0` (1) | `build.gradle`, Xcode `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` (keep the extension in sync) |

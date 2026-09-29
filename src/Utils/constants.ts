@@ -156,7 +156,7 @@ export const APP_CONFIG = {
   API_TIMEOUT_MS: 10000,
   PROPERTY_TEST_ITERATIONS: 100,
   // Keep in sync with versionName (android/app/build.gradle) and MARKETING_VERSION (Xcode).
-  APP_VERSION: '1.0',
+  APP_VERSION: '1.1',
   // Hosted from the public nextup-privacy repo (GitHub Pages); the Settings row hides when null.
   PRIVACY_POLICY_URL: 'https://anubhavprogramer.github.io/nextup-privacy/' as string | null,
   TMDB_URL: 'https://www.themoviedb.org',
