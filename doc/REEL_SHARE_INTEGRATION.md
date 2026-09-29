@@ -4,53 +4,57 @@ How "Instagram → Share → NextUP" works on iOS and Android (shipped 2026-09-2
 
 ## Flow
 
+The two platforms differ on purpose: **Android shows a sheet over Instagram and never opens the app**, while iOS opens the app on the Import screen (a free Apple account can't share storage with a share extension).
+
 ```
-iOS:     Instagram → Share → More → NextUP  (NextUPShare.appex)
-Android: Instagram → Share → NextUP          (MainActivity, ACTION_SEND text/plain)
-                     │
-                     ▼   both open the app with
-          nextup://import?url=<percent-encoded shared text>
-                     │
-   React Native Linking: getInitialURL() (cold start) + 'url' events (warm start)
-                     ▼
-   ShareIntentProvider  → parseImportLink() → pendingShare
-                     ▼
-   AppNavigator (once the stack is mounted and onboarding is done)
-     → navigate('ReelImport', { sharedText })
-                     ▼
-   ReelImportScreen → findInstagramReelUrl() → resolveReel() → POST /api/reels/resolve
-     → candidates → pick title + list → addToCollection → MediaDetail
+Android: Instagram → Share → NextUP
+   └─ ShareActivity (translucent, in the caller's task, excluded from Recents)
+        └─ React root "NextUPShare" (src/Share/ShareSheetApp.tsx), launch prop sharedText
+             • no profile yet  → "Set up NextUP first" → opens the app via nextup://import (share is held)
+             • resolveReel()   → movie list (poster · year · "Already in …") + list chips (default Want to Watch)
+             • tap a movie     → dataManager.addItem → "Added to … ✓" → closes after 1.1 s (BackHandler.exitApp)
+             • error           → reason + Try again (if useful) + "Search in NextUP" (opens the Import screen)
+
+iOS:     Instagram → Share → More → NextUP (NextUPShare.appex)
+   └─ opens nextup://import?url=<text> → Linking → ShareIntentProvider → AppNavigator
+        → ReelImportScreen → resolveReel() → pick title + list → MediaDetail
 ```
 
-One deep link on both platforms means there's no custom native module and only one JS code path.
+The Android sheet runs in NextUP's own process and JS runtime, so it uses the same `DataManager`, AsyncStorage and backend client as the app. When the app comes back to the foreground it reloads its lists (`AppState` listener in `AppProvider`), so titles saved from the sheet show up straight away.
 
 ## Pieces
 
 | Piece | File |
 |---|---|
+| Android share target | `android/app/src/main/java/com/anubhavx10tion/nextup/ShareActivity.kt`, `AndroidManifest.xml` (SEND filter on `ShareActivity`), `res/values/styles.xml` (`ShareTheme`, translucent) |
+| Android sheet UI | `src/Share/ShareSheetApp.tsx` (+ tests), registered as `NextUPShare` in `index.js` |
 | iOS share extension | `ios/NextUPShare/ShareViewController.swift`, `ios/NextUPShare/Info.plist` (accepts 1 web URL or text) |
 | iOS URL scheme + forwarding to Linking | `ios/NextUP/Info.plist` (`CFBundleURLTypes: nextup`), `ios/NextUP/AppDelegate.swift` (`RCTLinkingManager`) |
-| Android share → import link | `android/app/src/main/java/com.anubhavx10tion.nextup/MainActivity.kt` (`toImportIntent`), `AndroidManifest.xml` (SEND + `nextup://import` filters) |
+| `nextup://import` on Android | `MainActivity` VIEW filter (used by the sheet's "Open / Search in NextUP") |
 | Link helpers | `src/Utils/reelLinks.ts` (+ tests) |
+| Error copy (sheet + Import screen) | `src/Utils/reelErrors.ts` |
 | Backend client | `src/API/reels.ts` (+ tests), `src/Config/env.ts` |
-| Hand-off | `src/Store/ShareIntentContext.tsx`, `src/Navigation/AppNavigator.tsx` |
-| UI | `src/Screens/ReelImportScreen.tsx` |
+| iOS hand-off | `src/Store/ShareIntentContext.tsx`, `src/Navigation/AppNavigator.tsx` |
+| iOS UI | `src/Screens/ReelImportScreen.tsx` |
 | Manual-search fallback | `Search` route param `initialQuery` |
+
+### Android details
+- `ShareActivity` is a second `ReactActivity` with main component `NextUPShare`. Its delegate passes `sharedText` as a launch option, which becomes the root component's prop.
+- `ShareTheme` makes the window transparent with no dim and no window animation; the sheet animates itself. `taskAffinity=""` and `excludeFromRecents` keep it out of Recents and off NextUP's own task, so closing it lands back in Instagram.
+- `BackHandler.exitApp()` finishes `ShareActivity` (not the whole app). The hardware back button and a tap on the backdrop close it too.
 
 ### iOS details
 - Target `NextUPShare`, bundle id `com.anubhavx10tion.nextup.share`, embedded in `NextUP.app/PlugIns` via the "Embed Foundation Extensions" build phase. It's plain Swift with no pods.
 - **No App Group**, so it works with a free (Personal Team) Apple ID. The extension can't call `UIApplication.shared.open`, so it walks the responder chain to `UIApplication` and invokes `open(_:options:completionHandler:)` at runtime. This is widely used but undocumented. If a future iOS breaks it, switch to an App Group (paid account) or a "copy link, then open NextUP" flow.
 - The shared text is percent-encoded with only ASCII unreserved characters left as-is, so the reel link's own `?`, `&` and `=` survive as one query value. JS decodes it with `decodeURIComponent`.
 
-### Android details
-- `MainActivity` rewrites an `ACTION_SEND` text intent into `ACTION_VIEW nextup://import?url=…` **before** `super.onCreate` / `super.onNewIntent`. React Native's Linking then treats it like any deep link, cold or warm.
-- `launchMode="singleTask"` means a warm share goes to `onNewIntent` rather than opening a second activity.
-
 ## Testing on a device
 
 | Case | Expected |
 |---|---|
-| App closed → share a reel | "Opening NextUP…" (iOS) → app launches on Import |
+| **Android:** share a reel from Instagram | Sheet slides up over Instagram, lists the movies; tap one → "Added ✓" → back in Instagram, app never opened |
+| **Android:** share before onboarding | Sheet says "Set up NextUP first" → Open NextUP → onboarding → Import screen |
+| **iOS:** app closed → share a reel | "Opening NextUP…" → app launches on Import |
 | App open on Home → share | Import is pushed on top; Back returns to Home |
 | App open on a detail screen → share | Import pushed; Back returns there |
 | Fresh install, not onboarded → share | Onboarding first, then Import opens |
@@ -64,7 +68,7 @@ One deep link on both platforms means there's no custom native module and only o
 ```sh
 adb shell am start -a android.intent.action.SEND -t text/plain \
   --es android.intent.extra.TEXT "https://www.instagram.com/reel/<id>/" \
-  com.anubhavx10tion.nextup
+  com.anubhavx10tion.nextup/.ShareActivity
 ```
 
 **Status:** iOS confirmed working on an iPhone 16 (iOS 26.6.1) by the user on 2026-09-29. Android compiles but hasn't been run on a device yet. How accurate the matching is on real reels hasn't been measured (see PRD §6.1).

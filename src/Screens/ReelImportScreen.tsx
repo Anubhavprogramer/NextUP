@@ -20,6 +20,7 @@ import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
 import { resolveReel, ReelCandidate, ReelError, ResolvedReel } from '../API/reels';
 import { findInstagramReelUrl } from '../Utils/reelLinks';
+import { REEL_ERROR_COPY } from '../Utils/reelErrors';
 import { getTMDBImageUrl, getCollectionStatusDisplayName } from '../Utils/helpers';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
 import { CollectionStatus, RootStackParamList, StorageError } from '../Types';
@@ -38,16 +39,6 @@ const STATUS_OPTIONS: { status: CollectionStatus; label: string; icon: string }[
   { status: 'watched', label: 'Watched', icon: 'checkmark-circle' },
 ];
 
-const ERROR_COPY: Record<string, { title: string; retry: boolean }> = {
-  UNSUPPORTED_URL: { title: "That doesn't look like an Instagram reel link", retry: false },
-  PRIVATE_OR_REMOVED: { title: 'This reel is private or no longer available', retry: false },
-  NO_MATCH: { title: "Couldn't find a movie or show in this reel", retry: false },
-  RATE_LIMITED: { title: 'Too many imports, try again in a minute', retry: true },
-  SCRAPE_BLOCKED: { title: "Instagram didn't let us read this reel right now", retry: true },
-  TIMEOUT: { title: 'This is taking too long', retry: true },
-  NETWORK_ERROR: { title: "Couldn't reach NextUP. Check your connection", retry: true },
-  UNKNOWN: { title: 'Something went wrong', retry: true },
-};
 
 export const ReelImportScreen: React.FC = () => {
   const { theme } = useTheme();
@@ -243,7 +234,7 @@ export const ReelImportScreen: React.FC = () => {
 
     if (state.kind === 'error') {
       const { error } = state;
-      const copy = ERROR_COPY[error.code] || ERROR_COPY.UNKNOWN;
+      const copy = REEL_ERROR_COPY[error.code] || REEL_ERROR_COPY.UNKNOWN;
       return (
         <View style={styles.centered}>
           <Icon name="sad-outline" size={56} color={theme.colors.textSecondary} />
