@@ -5,50 +5,62 @@ React Native 0.83 · React 19 · TypeScript · New Architecture (`newArchEnabled
 ## Folder map
 
 ```
-App.tsx                     Provider tree + status bar
+App.tsx                           Provider tree + status bar (always dark text)
 src/
-├── Navigation/AppNavigator.tsx   Gate (loading → error → onboarding) + native stack
-├── Screens/                      One file per screen
+├── Navigation/AppNavigator.tsx   Gates (loading → error → onboarding) + native stack; opens pending shares
+├── Screens/
 │   ├── ProfileSetupScreen        First launch: asks for a name
-│   ├── HomeScreen                Greeting, 3 StatCards, 3 CollectionSections
-│   ├── SearchScreen              Debounced TMDB multi-search + recent searches
+│   ├── HomeScreen                Greeting, 3 StatCards, 3 CollectionSections (long-press → action sheet)
+│   ├── SearchScreen              Debounced TMDB multi-search, recent searches, optional initialQuery
 │   ├── MediaDetailScreen         Poster, metadata, add / move / remove
-│   ├── CollectionScreen          "See all" for one status
-│   ├── LoadingScreen, ErrorScreen
-├── Store/                        React Context state
+│   ├── CollectionScreen          "See all" for one list (long-press → action sheet)
+│   ├── ReelImportScreen          Shared reel → candidates → pick title + list → add
+│   └── LoadingScreen, ErrorScreen
+├── Store/                        React Context
 │   ├── AppContext.tsx            appState + collection actions (wraps DataManager)
 │   ├── ThemeContext.tsx          the single light theme (useTheme / useThemeColor)
 │   ├── ToastContext.tsx          showSuccess / showError / showInfo
+│   ├── DialogContext.tsx         showActionSheet (themed bottom sheet)
+│   ├── ShareIntentContext.tsx    receives nextup://import links, holds pendingShare
 │   └── hooks.ts                  useDebounce
 ├── Manager/                      Business logic singletons (no React)
 │   ├── DataManager.ts            Profile, collections, search history, change events
 │   └── StorageManager.ts         AsyncStorage wrapper: retry, corruption cleanup, backup/restore, migrations
-├── API/tmdb.ts                   fetch wrapper + search/discover/details, maps TMDB → MediaItem
+├── API/
+│   ├── tmdb.ts                   TMDB search/discover/details → MediaItem
+│   └── reels.ts                  POST /api/reels/resolve → ResolvedReel | ReelError(code)
+├── Config/env.ts                 Backend base URL, API key, timeout
 ├── Components/
-│   ├── Themed/                   ThemedView/Text/Button/Input/Card (read from ThemeContext)
-│   └── Regular/                  MediaCard, MediaList, CollectionSection, StatCard, StatusButton, Toast, …
-├── Types/index.ts                All domain types, type guards, STORAGE_KEYS, VALIDATION_CONSTANTS
+│   ├── Themed/                   ThemedView/Text/Button/Input/Card
+│   └── Regular/                  MediaCard, MediaList, CollectionSection, StatCard, StatusButton, Toast, ActionSheet, …
+├── Types/index.ts                Domain types, type guards, STORAGE_KEYS, VALIDATION_CONSTANTS, RootStackParamList
 └── Utils/
     ├── constants.ts              DESIGN_CONSTANTS, LIGHT_THEME, TMDB_CONFIG, APP_CONFIG
-    ├── helpers.ts                id gen, formatting, image URLs, sorting, stats
-    ├── debugger.ts               `logger` (in-memory log buffer, exportLogs)
+    ├── helpers.ts                ids, formatting, image URLs, sorting, stats
+    ├── reelLinks.ts              findInstagramReelUrl, parseImportLink
+    ├── collectionActions.ts      shared "Want to Watch / Watching / Watched" sheet actions
+    ├── debugger.ts               `logger`
     └── Imges.ts                  static image requires
+ios/NextUPShare/                  iOS share extension (Swift), see REEL_SHARE_INTEGRATION.md
 ```
+
+Provider order in `App.tsx`: `SafeAreaProvider → ThemeProvider → AppProvider → ToastProvider → DialogProvider → ShareIntentProvider → AppNavigator`.
 
 ## Layering
 
 ```
-Screen ──uses──▶ useApp() / useTheme() / useToast()
-                     │
-                     ▼
-               AppContext ──calls──▶ DataManager ──▶ StorageManager ──▶ AsyncStorage
-                     ▲                    │
-                     └──── change events ─┘   (ITEM_ADDED, ITEM_UPDATED, …)
+Screen ──▶ useApp() / useTheme() / useToast() / useDialog()
+              │
+              ▼
+        AppContext ──▶ DataManager ──▶ StorageManager ──▶ AsyncStorage
+              ▲            │
+              └─ events ───┘  (PROFILE_UPDATED, COLLECTION_CLEARED)
 
-Screen ──calls directly──▶ API/tmdb.ts ──▶ TMDB
+Screen ──▶ API/tmdb.ts  ──▶ TMDB
+ReelImportScreen ──▶ API/reels.ts ──▶ NextUP backend
 ```
 
-Rule of thumb for new code: **network calls go in `API/`, orchestration and persistence go in `Manager/`, React state goes in `Store/`, and screens only compose.** The reel feature should follow the same pattern: `API/reels.ts` → `Manager/ReelManager.ts` → a screen.
+Rule of thumb: **network calls in `API/`, persistence and orchestration in `Manager/`, React state in `Store/`, screens only compose.**
 
 ## Domain model
 
@@ -60,9 +72,7 @@ CollectionItem  { id: uuid, mediaItem, status, addedAt, updatedAt,
 CollectionStatus = 'watched' | 'watching' | 'will_watch'
 ```
 
-Storage keys (`STORAGE_KEYS`): `user_profile`, `collections` (a single blob `{watched[], watching[], will_watch[]}`), `theme_preference`, `is_first_launch`, `search_history`.
-
-A `mediaItem.id` appears at most once across all three lists. `DataManager.addItem` enforces this and throws `DUPLICATE_ITEM`.
+Storage keys: `user_profile`, `collections` (one blob `{watched[], watching[], will_watch[]}`), `is_first_launch`, `search_history`. A `mediaItem.id` appears at most once across the three lists; `DataManager.addItem` throws `DUPLICATE_ITEM` otherwise.
 
 ## Navigation
 
@@ -70,19 +80,34 @@ A `mediaItem.id` appears at most once across all three lists. `DataManager.addIt
 1. `LoadingScreen` while `loading`
 2. `ErrorScreen` when `error`
 3. `ProfileSetupScreen` when `isFirstLaunch || !userProfile`
-4. `NavigationContainer` with the stack `Main | Search | Collection | MediaDetail`
+4. `NavigationContainer` (with `navigationRef`) and the stack `Main | Search | Collection | ReelImport | MediaDetail`
 
-> **Important invariant:** `loading` is only for the *initial* load. `refreshAppState()` reloads silently. If it flips `loading`, `AppNavigator` unmounts the `NavigationContainer` and the user loses their place (this was AUDIT A-1, now fixed and covered by `src/Store/__tests__/AppContext.test.tsx`). Collection mutations must go through `useApp()`. `AppProvider` no longer refreshes on `ITEM_*` events, so calling `dataManager` directly from a screen won't update the UI.
+Route params: `Search: { initialQuery? }`, `Collection: { status }`, `ReelImport: { sharedText }`, `MediaDetail: { mediaItem }`. `Settings` and `Statistics` are declared but not registered yet (AUDIT A-4).
 
-`RootStackParamList` also declares `Statistics` and `Settings`, but no screens are registered for them yet.
+> **Invariant:** `loading` is only for the *initial* load. `refreshAppState()` reloads silently. If it ever flips `loading`, the `NavigationContainer` unmounts and the user loses their place. `src/Store/__tests__/AppContext.test.tsx` guards this. Collection changes must go through `useApp()`: `AppProvider` doesn't refresh on `ITEM_*` events, so calling `dataManager` directly from a screen won't update the UI.
 
-## Theming
+**Pending shares:** when `ShareIntentProvider` has a `pendingShare`, `AppNavigator` waits until the main stack is mounted (`onReady`) and onboarding is done, then calls `navigationRef.navigate('ReelImport', …)`.
 
-NextUP has **one theme**: `LIGHT_THEME` (warm peach). Dark mode was removed on purpose. `ThemeContext` always provides the light palette, and the native projects pin light mode so system UI can't go dark either: `UIUserInterfaceStyle = Light` in both iOS `Info.plist` files (app and share extension), and a `Theme.AppCompat.Light` parent with `forceDarkAllowed=false` on Android. Components read `theme.colors.*` and `DESIGN_CONSTANTS.*` through `useTheme()`, and don't hardcode values.
+## Popups
+
+Use `useDialog().showActionSheet({ media?, title?, message?, actions, cancelLabel? })` instead of `Alert.alert`. Each action is `{ label, icon?, iconColor?, destructive?, onPress }`.
+
+- The sheet slides up over a dimmed backdrop; tapping the backdrop, Cancel or Android back closes it.
+- `onPress` runs **after** the close animation, so navigation and toasts don't clash with the modal.
+- `collectionStatusActions(theme, onSelect, { exclude?, prefix? })` builds the standard three list actions with the same icons and colours as the Home stats.
+- Tests: `src/Store/__tests__/DialogContext.test.tsx`.
+
+## Theme
+
+NextUP has **one theme**: `LIGHT_THEME` (warm peach). There is no dark mode. `ThemeContext` always provides the light palette. Light mode is also pinned natively so system UI (keyboard, sheets, the share extension) can't go dark:
+- iOS: `UIUserInterfaceStyle = Light` in `ios/NextUP/Info.plist` and `ios/NextUPShare/Info.plist`
+- Android: `AppTheme` extends `Theme.AppCompat.Light.NoActionBar` with `forceDarkAllowed=false`
+
+Always read colours via `useTheme().theme.colors.*` and sizes via `DESIGN_CONSTANTS.*`; don't hardcode values.
 
 ## Error handling
 
-- `StorageError(code)` and `APIError(code, status)` live in `Types`.
-- `StorageManager` retries up to 3 times with linear backoff. If JSON is corrupt, it deletes the key.
-- `DataManager` rethrows `StorageError`s unchanged, so codes like `DUPLICATE_ITEM` and `ITEM_NOT_FOUND` reach the UI. Anything else is wrapped with an operation-level code.
-- Screens catch errors and show a toast.
+- `StorageError(code)`, `APIError(code, status)` in `Types`; `ReelError(code, keywords)` in `API/reels.ts`.
+- `StorageManager` retries 3× with backoff and deletes keys holding corrupt JSON.
+- `DataManager` rethrows `StorageError` unchanged, so `DUPLICATE_ITEM` / `ITEM_NOT_FOUND` reach the UI.
+- Screens catch errors and show a toast. The Import screen maps `ReelError.code` to a message plus Retry / Search manually.

@@ -1,72 +1,105 @@
-# NextUP App — Setup, Build & Release
+# NextUP App — Setup, Run, Release
 
 ## Requirements
-- Node ≥ 20, JDK 17, Android SDK (compile/target 36, min 24), NDK 27.1.12297006
-- Kotlin 2.1.20 (set in `android/build.gradle`)
-- iOS (later): Xcode + CocoaPods via `bundle exec pod install`
+- Node ≥ 20 (tested on 26), npm
+- **iOS:** Xcode 26+ (tested on 27), CocoaPods (Homebrew `pod`), an Apple ID signed in to Xcode
+- **Android:** JDK 17, Android SDK (compile/target 36, min 24), NDK 27.1.12297006, Kotlin 2.1.20
 
-## Run (dev)
+## First-time setup
 ```sh
+cd NextUP
 npm install
-npm run setup-fonts      # copies vector-icon fonts (scripts/setup-fonts.sh)
-npm start                # Metro
-npm run android          # in another terminal
+npm run setup-fonts          # copies Ionicons into Android assets
+cd ios && pod install && cd ..
 ```
-`npm run clean-build` clears the RN and Gradle caches when native builds act up.
+Run `pod install` again whenever native dependencies or `ios/Podfile` change. The Podfile's `post_install` does two things Xcode 26+ needs: it raises pods still on iOS 13.4, and it compiles `fmt` as C++17.
+
+## Run on your iPhone
+
+1. Plug in by cable, unlock, tap **Trust**. Turn on **Developer Mode** once (Settings → Privacy & Security).
+2. Check the phone shows up under **Devices** (not "Devices Offline"):
+   ```sh
+   xcrun xctrace list devices
+   ```
+3. **Standalone build** (JS bundled in; no Metro needed; best for testing sharing):
+   ```sh
+   npx react-native run-ios --udid <your-UDID> --mode Release
+   ```
+   **Dev build** (live reload; phone and Mac on the same Wi-Fi):
+   ```sh
+   npm start                                   # terminal 1
+   npx react-native run-ios --udid <your-UDID> # terminal 2
+   ```
+4. First launch: Settings → General → VPN & Device Management → your Apple ID → **Trust**.
+
+From Xcode instead: `open ios/NextUP.xcworkspace` (the workspace, not the `.xcodeproj`) → ⇧⌘K to clean → pick your iPhone → ▶. Signing: **NextUP** and **NextUPShare** targets → Signing & Capabilities → your team, "Automatically manage signing".
+
+> With a free Apple ID, installed builds stop opening after **7 days**; run the build again. Yellow Xcode warnings ("Update to recommended settings", "script phase will run during every build") are harmless.
+
+## Run on Android
+```sh
+npm start
+npm run android
+```
+Test sharing without Instagram: see the `adb` command in [REEL_SHARE_INTEGRATION.md](./REEL_SHARE_INTEGRATION.md#testing-on-a-device).
+
+## Tests and checks
+```sh
+npx jest            # 17 tests
+npx tsc --noEmit    # currently 12 errors that were already there (AUDIT A-8); new code should add none
+```
 
 ## Configuration
-Right now the only config is the TMDB key, hardcoded in `src/API/tmdb.ts`. **It should move to env vars** (AUDIT S2):
 
-```sh
-npm i react-native-config
-```
-`.env` (git-ignored) and `.env.example` (committed):
-```
-TMDB_API_KEY=
-NEXTUP_API_URL=https://<project>.vercel.app
-NEXTUP_API_KEY=
-```
-
-## Android identity
-| Field | Current value | Where |
+| What | Where | Notes |
 |---|---|---|
-| `applicationId` / `namespace` | `com.anubhavx10tion.codes` | `android/app/build.gradle:80,83` |
-| `versionCode` / `versionName` | `1` / `1.0` | `android/app/build.gradle:86-87` |
-| Display name | `NextUP` | `app.json`, `strings.xml` |
+| Backend URL + API key | `src/Config/env.ts` | Must match the Vercel `NEXTUP_API_KEY`; rebuild the app after changing it |
+| TMDB key | `src/API/tmdb.ts` | Hardcoded (accepted for a private repo) |
 
-> Decide the final `applicationId` **before the first Play upload**. It's permanent after that.
+## App identity
 
-## Release signing
+| Field | Value | Where |
+|---|---|---|
+| Android `applicationId` | `com.anubhavx10tion.codes` | `android/app/build.gradle` |
+| iOS bundle id | `com.anubhavx10tion.nextup` | Xcode target NextUP |
+| iOS share extension | `com.anubhavx10tion.nextup.share` | Xcode target NextUPShare |
+| Version | `1.0` (1) | `build.gradle`, Xcode `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` (keep the extension in sync) |
+| URL scheme | `nextup://` | iOS `Info.plist`, `AndroidManifest.xml` |
 
-The current setup commits `nextup-release-key.jks` and puts its passwords in `android/gradle.properties`. **That's accepted for now, because the repo is private and the app is personal.** Still enroll in **Play App Signing** (step 4), so a leaked upload key can be reset. If the repo ever becomes public, harden it like this:
+> Decide the final Android `applicationId` **before the first Play upload**. It's permanent after that.
 
-1. Generate a new upload key and keep it **outside** the repo:
-   ```sh
-   keytool -genkeypair -v -storetype PKCS12 -keystore ~/keys/nextup-upload.jks \
-     -alias nextup-upload -keyalg RSA -keysize 2048 -validity 10000
-   ```
-2. Put the credentials in `~/.gradle/gradle.properties` (user-level, never committed):
-   ```
-   MYAPP_UPLOAD_STORE_FILE=/Users/<you>/keys/nextup-upload.jks
-   MYAPP_UPLOAD_KEY_ALIAS=nextup-upload
-   MYAPP_UPLOAD_STORE_PASSWORD=...
-   MYAPP_UPLOAD_KEY_PASSWORD=...
-   ```
-3. Remove the four `MYAPP_UPLOAD_*` lines from `android/gradle.properties`. Run `git rm --cached nextup-release-key.jks android/app/nextup-release-key.jks` and add `*.jks` (except `debug.keystore`) to `.gitignore`.
-4. Enroll in **Play App Signing** when you create the app in Play Console. Google keeps the real app-signing key, and yours is only the upload key.
+## Git & PR workflow
 
-## Build the release bundle
+`main` is the release branch. For each change:
+```sh
+git switch main && git pull
+git switch -c feat/<name>                 # new branch
+# …work, commit…
+git log --oneline origin/main..HEAD       # what the PR will contain
+git push -u origin feat/<name>
+gh pr create --base main --head feat/<name> --web
+```
+After merging on GitHub: `git switch main && git pull && git branch -d feat/<name>`.
+
+## Release signing (Android)
+
+`nextup-release-key.jks` and its passwords are committed (`android/gradle.properties`). That's **accepted** because the repo is private. Still enroll in **Play App Signing** so the upload key can be reset. If the repo ever becomes public:
+1. `keytool -genkeypair -v -storetype PKCS12 -keystore ~/keys/nextup-upload.jks -alias nextup-upload -keyalg RSA -keysize 2048 -validity 10000`
+2. Move the `MYAPP_UPLOAD_*` values to `~/.gradle/gradle.properties`.
+3. `git rm --cached` the `.jks` files and ignore `*.jks` (except `debug.keystore`).
+
+## Build the Play Store bundle
 ```sh
 cd android && ./gradlew bundleRelease
 # → android/app/build/outputs/bundle/release/app-release.aab
 ```
 Before uploading:
-- [ ] Turn on `minifyEnabled true` + `shrinkResources true` for release, then test it. RN needs its ProGuard rules; check that vector icons and AsyncStorage still work.
-- [ ] Install a release APK on a real device (`./gradlew assembleRelease`) and run through onboarding → search → add → share a reel
+- [ ] Turn on `minifyEnabled` + `shrinkResources`, then test (vector icons, AsyncStorage, share intent)
+- [ ] Install a release APK (`./gradlew assembleRelease`) and run onboarding → search → add → share a reel
 - [ ] Bump `versionCode` on every upload
 
 ## Play Console checklist
-- [ ] App content: privacy policy URL, Data Safety (no data collected; reel URLs are sent to our server for processing), target audience, content rating
+- [ ] Privacy policy URL; Data Safety (no personal data; reel links go to our server, searches to TMDB); target audience; content rating
 - [ ] TMDB attribution in the app (Settings → About)
-- [ ] Store listing: 512×512 icon, 1024×500 feature graphic, ≥ 4 phone screenshots, short (80 chars) and full description
-- [ ] Internal testing → closed testing (a new personal developer account needs **12 testers opted in for 14 days** before production)
+- [ ] 512×512 icon, 1024×500 feature graphic, ≥ 4 screenshots, short + full description
+- [ ] Internal testing → closed testing (new personal accounts need **12 testers for 14 days**) → production
