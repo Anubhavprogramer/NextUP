@@ -180,7 +180,18 @@ export const HomeScreen: React.FC = () => {
 
             <TouchableOpacity
               style={styles.searchButton}
+              onPress={() => navigation.navigate('Settings')}
+              accessibilityRole="button"
+              accessibilityLabel="Settings"
+            >
+              <Icon name="settings-outline" size={22} color={theme.colors.primaryDark} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.searchButton}
               onPress={() => navigation.navigate('Search')}
+              accessibilityRole="button"
+              accessibilityLabel="Search"
             >
               <Image
                 source={Images.search}

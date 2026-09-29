@@ -155,4 +155,9 @@ export const APP_CONFIG = {
   STORAGE_RETRY_ATTEMPTS: 3,
   API_TIMEOUT_MS: 10000,
   PROPERTY_TEST_ITERATIONS: 100,
+  // Keep in sync with versionName (android/app/build.gradle) and MARKETING_VERSION (Xcode).
+  APP_VERSION: '1.0',
+  // Set to the hosted policy URL before the Play Store release; the Settings row hides while null.
+  PRIVACY_POLICY_URL: null as string | null,
+  TMDB_URL: 'https://www.themoviedb.org',
 } as const;

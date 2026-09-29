@@ -45,7 +45,7 @@ Test sharing without Instagram: see the `adb` command in [REEL_SHARE_INTEGRATION
 
 ## Tests and checks
 ```sh
-npx jest            # 17 tests
+npx jest            # 28 tests
 npx tsc --noEmit    # currently 12 errors that were already there (AUDIT A-8); new code should add none
 ```
 

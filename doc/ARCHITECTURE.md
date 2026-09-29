@@ -15,6 +15,7 @@ src/
 │   ├── MediaDetailScreen         Poster, metadata, add / move / remove
 │   ├── CollectionScreen          "See all" for one list (long-press → action sheet)
 │   ├── ReelImportScreen          Shared reel → candidates → pick title + list → add
+│   ├── SettingsScreen            Edit name · export/import backup · version, privacy link, TMDB attribution
 │   └── LoadingScreen, ErrorScreen
 ├── Store/                        React Context
 │   ├── AppContext.tsx            appState + collection actions (wraps DataManager)
@@ -24,8 +25,9 @@ src/
 │   ├── ShareIntentContext.tsx    receives nextup://import links, holds pendingShare
 │   └── hooks.ts                  useDebounce
 ├── Manager/                      Business logic singletons (no React)
-│   ├── DataManager.ts            Profile, collections, search history, change events
-│   └── StorageManager.ts         AsyncStorage wrapper: retry, corruption cleanup, backup/restore, migrations
+│   ├── DataManager.ts            Profile, collections, search history, mergeCollectionItems, change events
+│   ├── BackupManager.ts          createExport / importBackup (validate + merge, never overwrite)
+│   └── StorageManager.ts         AsyncStorage wrapper: retry, corruption cleanup, migrations
 ├── API/
 │   ├── tmdb.ts                   TMDB search/discover/details → MediaItem
 │   └── reels.ts                  POST /api/reels/resolve → ResolvedReel | ReelError(code)
@@ -39,6 +41,7 @@ src/
     ├── helpers.ts                ids, formatting, image URLs, sorting, stats
     ├── reelLinks.ts              findInstagramReelUrl, parseImportLink
     ├── collectionActions.ts      shared "Want to Watch / Watching / Watched" sheet actions
+    ├── backupFiles.ts            saveBackupFile / pickBackupFile (system save + file picker)
     ├── debugger.ts               `logger`
     └── Imges.ts                  static image requires
 ios/NextUPShare/                  iOS share extension (Swift), see REEL_SHARE_INTEGRATION.md
@@ -72,6 +75,8 @@ CollectionItem  { id: uuid, mediaItem, status, addedAt, updatedAt,
 CollectionStatus = 'watched' | 'watching' | 'will_watch'
 ```
 
+App metadata lives in `APP_CONFIG` (`Utils/constants.ts`): `APP_VERSION` (keep in sync with the native versions), `PRIVACY_POLICY_URL` (the Settings row is hidden while it's `null`), `TMDB_URL`.
+
 Storage keys: `user_profile`, `collections` (one blob `{watched[], watching[], will_watch[]}`), `is_first_launch`, `search_history`. A `mediaItem.id` appears at most once across the three lists; `DataManager.addItem` throws `DUPLICATE_ITEM` otherwise.
 
 ## Navigation
@@ -82,7 +87,21 @@ Storage keys: `user_profile`, `collections` (one blob `{watched[], watching[], w
 3. `ProfileSetupScreen` when `isFirstLaunch || !userProfile`
 4. `NavigationContainer` (with `navigationRef`) and the stack `Main | Search | Collection | ReelImport | MediaDetail`
 
-Route params: `Search: { initialQuery? }`, `Collection: { status }`, `ReelImport: { sharedText }`, `MediaDetail: { mediaItem }`. `Settings` and `Statistics` are declared but not registered yet (AUDIT A-4).
+Route params: `Search: { initialQuery? }`, `Collection: { status }`, `ReelImport: { sharedText }`, `MediaDetail: { mediaItem }`, `Settings` (none). Settings opens from the gear icon in the Home header. `Statistics` is declared but not registered yet (AUDIT A-4).
+
+## Backup (Settings → Your data)
+
+```
+Export: createExport() → ExportData JSON → temp file (react-native-fs) → system "Save to…" dialog (saveDocuments)
+Import: file picker (pick) → local copy (keepLocalCopy) → readFile → importBackup(json)
+          → validate (format version, isCollectionItem per entry)
+          → dataManager.mergeCollectionItems → DATA_IMPORTED event → AppContext refresh
+```
+
+- **Format:** `{ version: "1", exportDate, userProfile, collections: { watched, watching, will_watch }, metadata: { totalItems, appVersion } }` (`ExportData`). File name: `nextup-backup-YYYY-MM-DD.json`.
+- **Import never removes or changes existing titles.** Items whose TMDB id is already saved are skipped, damaged entries are counted and ignored, and the current profile is kept. Bump `BACKUP_FORMAT_VERSION` if the shape changes, and keep reading old versions.
+- Native packages: `@react-native-documents/picker` (save dialog + picker) and `@dr.pogodin/react-native-fs` (temp file read/write). Both are mocked in `src/Utils/testSetup.ts`.
+- Tests: `src/Manager/__tests__/BackupManager.test.ts` (round trip, duplicates, damaged/invalid files) and `src/Utils/__tests__/backupFiles.test.ts`.
 
 > **Invariant:** `loading` is only for the *initial* load. `refreshAppState()` reloads silently. If it ever flips `loading`, the `NavigationContainer` unmounts and the user loses their place. `src/Store/__tests__/AppContext.test.tsx` guards this. Collection changes must go through `useApp()`: `AppProvider` doesn't refresh on `ITEM_*` events, so calling `dataManager` directly from a screen won't update the UI.
 

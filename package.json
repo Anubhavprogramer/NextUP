@@ -14,7 +14,9 @@
     "clean-build": "npx react-native clean && cd android && ./gradlew clean && cd .."
   },
   "dependencies": {
+    "@dr.pogodin/react-native-fs": "^2.40.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-documents/picker": "^12.0.2",
     "@react-navigation/bottom-tabs": "^7.8.12",
     "@react-navigation/native": "^7.1.25",
     "@react-navigation/native-stack": "^7.8.6",

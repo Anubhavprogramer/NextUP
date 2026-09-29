@@ -1892,6 +1892,34 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
+  - react-native-document-picker (12.0.2):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - react-native-safe-area-context (5.6.2):
     - boost
     - DoubleConversion
@@ -2536,6 +2564,34 @@ PODS:
     - React-perflogger (= 0.83.0)
     - React-utils (= 0.83.0)
     - SocketRocket
+  - ReactNativeFs (2.40.3):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - RNCAsyncStorage (2.2.0):
     - boost
     - DoubleConversion
@@ -2727,6 +2783,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - "react-native-document-picker (from `../node_modules/@react-native-documents/picker`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-networking (from `../node_modules/react-native/ReactCommon/react/networking`)
@@ -2761,6 +2818,7 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios/ReactAppDependencyProvider`)
   - ReactCodegen (from `build/generated/ios/ReactCodegen`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "ReactNativeFs (from `../node_modules/@dr.pogodin/react-native-fs`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -2860,6 +2918,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-document-picker:
+    :path: "../node_modules/@react-native-documents/picker"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-NativeModulesApple:
@@ -2928,6 +2988,8 @@ EXTERNAL SOURCES:
     :path: build/generated/ios/ReactCodegen
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  ReactNativeFs:
+    :path: "../node_modules/@dr.pogodin/react-native-fs"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNGestureHandler:
@@ -2983,6 +3045,7 @@ SPEC CHECKSUMS:
   React-logger: 9e597cbeda7b8cc8aa8fb93860dade97190f69cc
   React-Mapbuffer: 20046c0447efaa7aace0b76085aa9bb35b0e8105
   React-microtasksnativemodule: 0e837de56519c92d8a2e3097717df9497feb33cb
+  react-native-document-picker: 3fa6cf293370de0bb5cb93917bcd2189e54032d5
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
   React-NativeModulesApple: 1a378198515f8e825c5931a7613e98da69320cee
   React-networking: bfd1695ada5a57023006ce05823ac5391c3ce072
@@ -3017,6 +3080,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: ebcf3a78dc1bcdf054c9e8d309244bade6b31568
   ReactCodegen: 11c08ff43a62009d48c71de000352e4515918801
   ReactCommon: 424cc34cf5055d69a3dcf02f3436481afb8b0f6f
+  ReactNativeFs: a552e9b2bf24c908b08d3ac6e95279ea2b3bacd4
   RNCAsyncStorage: 29f0230e1a25f36c20b05f65e2eb8958d6526e82
   RNGestureHandler: 73726300d4c5ca4d80378cae85f9dad8908b3289
   RNScreens: ffbb0296608eb3560de641a711bbdb663ed1f6b4
