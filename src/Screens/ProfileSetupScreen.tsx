@@ -1,64 +1,95 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  ScrollView,
-  StyleSheet,
+  Animated,
+  Easing,
+  Image,
   KeyboardAvoidingView,
   Platform,
-  Image,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  View,
+  useWindowDimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-import {
-  ThemedView,
-  ThemedText,
-  ThemedInput,
-  ThemedButton,
-} from '../Components/Themed';
-
+import { ThemedText, ThemedInput, ThemedButton } from '../Components/Themed';
+import { PosterWall } from '../Components/Regular/PosterWall';
 import { useTheme } from '../Store/ThemeContext';
 import { useToast } from '../Store/ToastContext';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
+import { getTMDBImageUrl } from '../Utils/helpers';
 import { dataManager } from '../Manager/DataManager';
-import { ProfileFormData, ProfileValidationErrors } from '../Types';
+import { discoverPopularMovies } from '../API/tmdb';
+import { ProfileFormData, ProfileValidationErrors, VALIDATION_CONSTANTS } from '../Types';
+import { logger } from '../Utils/debugger';
 
 export interface ProfileSetupScreenProps {
   onProfileCreated: () => void;
 }
 
-export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
-  onProfileCreated,
-}) => {
+const FEATURES = [
+  { icon: 'paper-plane', label: 'Share a reel' },
+  { icon: 'bookmark', label: 'Save in a tap' },
+  { icon: 'play-circle', label: 'Track what’s next' },
+];
+
+type Step = 'welcome' | 'name';
+
+/**
+ * First launch: a movie-app style welcome (drifting wall of popular posters)
+ * followed by a one-field profile step.
+ */
+export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ onProfileCreated }) => {
   const { theme } = useTheme();
   const { showError } = useToast();
+  const insets = useSafeAreaInsets();
+  const { height: screenHeight } = useWindowDimensions();
 
-  const [formData, setFormData] = useState<ProfileFormData>({
-    name: '',
-  });
-
+  const [step, setStep] = useState<Step>('welcome');
+  const [posters, setPosters] = useState<string[]>([]);
+  const [formData, setFormData] = useState<ProfileFormData>({ name: '' });
   const [errors, setErrors] = useState<ProfileValidationErrors>({});
   const [loading, setLoading] = useState(false);
+  const stepAnim = useRef(new Animated.Value(0)).current;
+
+  // Real, current posters make the first screen feel alive; offline it keeps neutral tiles.
+  useEffect(() => {
+    let cancelled = false;
+    discoverPopularMovies(1)
+      .then(response => {
+        const urls = response.results
+          .map(item => getTMDBImageUrl(item.posterPath, 'w185'))
+          .filter((url): url is string => !!url);
+        if (!cancelled) setPosters(urls);
+      })
+      .catch(error => logger.warn('ProfileSetup', 'Poster wall unavailable', { error: String(error) }));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const goToName = () => {
+    setStep('name');
+    stepAnim.setValue(0);
+    Animated.timing(stepAnim, { toValue: 1, duration: 260, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+  };
 
   const validateForm = () => {
     const newErrors: ProfileValidationErrors = {};
-
     if (!formData.name.trim()) {
       newErrors.name = 'Please enter your name';
+    } else if (formData.name.length > VALIDATION_CONSTANTS.MAX_NAME_LENGTH) {
+      newErrors.name = `Name cannot exceed ${VALIDATION_CONSTANTS.MAX_NAME_LENGTH} characters`;
     }
-
-    if (formData.name.length > 50) {
-      newErrors.name = 'Name cannot exceed 50 characters';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-
     setLoading(true);
-
     try {
       await dataManager.createUserProfile(formData.name.trim());
       await dataManager.completeFirstLaunch();
@@ -70,154 +101,112 @@ export const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({
     }
   };
 
-  const updateFormData = (field: keyof ProfileFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const wallHeight = Math.round(screenHeight * (step === 'welcome' ? 0.52 : 0.36));
 
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
+  const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.colors.background },
+    hero: { height: wallHeight },
+    content: {
+      flexGrow: 1,
+      paddingHorizontal: DESIGN_CONSTANTS.CONTAINER_PADDING + 4,
+      paddingBottom: Math.max(insets.bottom, DESIGN_CONSTANTS.SPACING.medium) + DESIGN_CONSTANTS.SPACING.small,
+      marginTop: -DESIGN_CONSTANTS.SPACING.small,
+    },
+    brand: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: DESIGN_CONSTANTS.SPACING.medium },
+    icon: { width: 44, height: 44, borderRadius: 11 },
+    brandName: { fontSize: 22, fontWeight: '800', color: theme.colors.primaryDark, letterSpacing: -0.5 },
+    headline: { fontSize: 34, lineHeight: 38, fontWeight: '800', color: theme.colors.primaryDark, letterSpacing: -1 },
+    sub: { color: theme.colors.textSecondary, marginTop: DESIGN_CONSTANTS.SPACING.small, fontSize: 15, lineHeight: 21 },
+    features: { flexDirection: 'row', gap: 8, marginTop: DESIGN_CONSTANTS.SPACING.large },
+    feature: {
+      flex: 1,
+      alignItems: 'center',
+      gap: 6,
+      paddingVertical: 12,
+      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.large,
+      backgroundColor: 'rgba(255,255,255,0.55)',
+    },
+    featureLabel: { fontSize: 12, fontWeight: '600', color: theme.colors.primaryDark, textAlign: 'center' },
+    spacer: { flex: 1, minHeight: DESIGN_CONSTANTS.SPACING.large },
+    note: { textAlign: 'center', color: theme.colors.textSecondary, marginTop: DESIGN_CONSTANTS.SPACING.small },
+    question: { fontSize: 26, lineHeight: 31, fontWeight: '800', color: theme.colors.primaryDark, letterSpacing: -0.6, marginBottom: 4 },
+    back: { alignSelf: 'center', marginTop: DESIGN_CONSTANTS.SPACING.small, padding: DESIGN_CONSTANTS.SPACING.small },
+  });
+
+  const nameStepStyle = {
+    opacity: stepAnim,
+    transform: [{ translateY: stepAnim.interpolate({ inputRange: [0, 1], outputRange: [24, 0] }) }],
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
-      <KeyboardAvoidingView
-        style={styles.keyboardAvoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <ThemedView style={styles.content}>
-            
-            {/* HERO SECTION */}
-            <View style={styles.hero}>
-              <Image
-                source={require('../../assets/app-icon.png')}
-                style={styles.logo}
-                resizeMode="contain"
-              />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} bounces={false}>
+          <View style={styles.hero}>
+            <PosterWall posters={posters} height={wallHeight} fade={0.6} topFade={insets.top + 36} />
+          </View>
 
-              <ThemedText variant="title" style={styles.title}>
-                Your Watchlist, Organized
-              </ThemedText>
-
-              <ThemedText
-                variant="body"
-                style={[styles.subtitle, { color: theme.colors.textSecondary }]}
-              >
-                Track shows, save movies, and never lose what you wanted to
-                watch again.
-              </ThemedText>
+          <View style={styles.content}>
+            <View style={styles.brand}>
+              <Image source={require('../../assets/app-icon.png')} style={styles.icon} accessibilityIgnoresInvertColors />
+              <ThemedText style={styles.brandName}>NextUP</ThemedText>
             </View>
 
-            {/* INPUT CARD */}
-            <View
-              style={[
-                styles.formCard,
-                {
-                  backgroundColor: theme.colors.background,
-                },
-              ]}
-            >
-              <ThemedText variant="subtitle" style={styles.inputTitle}>
-                Let's start with your name
-              </ThemedText>
-
-              <ThemedInput
-                placeholder="Enter your name"
-                value={formData.name}
-                onChangeText={(text) => updateFormData('name', text)}
-                error={errors.name}
-                autoCapitalize="words"
-                maxLength={50}
-              />
-            </View>
-
-            {/* CTA */}
-            <View style={styles.buttonContainer}>
-              <ThemedButton
-                title="Continue"
-                onPress={handleSubmit}
-                loading={loading}
-                disabled={loading}
-                fullWidth
-              />
-            </View>
-
-            {/* FOOTER */}
-            <ThemedText
-              variant="caption"
-              style={[styles.footer, { color: theme.colors.textSecondary }]}
-            >
-              Takes less than 5 seconds
-            </ThemedText>
-          </ThemedView>
+            {step === 'welcome' ? (
+              <>
+                <ThemedText style={styles.headline} accessibilityRole="header">
+                  Your Watchlist,{'\n'}Organized
+                </ThemedText>
+                <ThemedText style={styles.sub}>
+                  Save movies straight from reels, track what you’re watching, and never lose what’s next.
+                </ThemedText>
+                <View style={styles.features}>
+                  {FEATURES.map(feature => (
+                    <View key={feature.label} style={styles.feature}>
+                      <Icon name={feature.icon} size={22} color={theme.colors.primary} />
+                      <ThemedText style={styles.featureLabel}>{feature.label}</ThemedText>
+                    </View>
+                  ))}
+                </View>
+                <View style={styles.spacer} />
+                <ThemedButton title="Get started" onPress={goToName} fullWidth />
+                <ThemedText variant="caption" style={styles.note}>
+                  No account needed · your lists stay on your phone
+                </ThemedText>
+              </>
+            ) : (
+              <Animated.View style={[{ flex: 1 }, nameStepStyle]}>
+                <ThemedText style={styles.question} accessibilityRole="header">
+                  What should we call you?
+                </ThemedText>
+                <ThemedText style={[styles.sub, { marginTop: 0, marginBottom: DESIGN_CONSTANTS.SPACING.medium }]}>
+                  We’ll use it to greet you. That’s it.
+                </ThemedText>
+                <ThemedInput
+                  placeholder="Your name"
+                  value={formData.name}
+                  onChangeText={text => {
+                    setFormData({ name: text });
+                    if (errors.name) setErrors({});
+                  }}
+                  error={errors.name}
+                  autoCapitalize="words"
+                  autoFocus
+                  maxLength={VALIDATION_CONSTANTS.MAX_NAME_LENGTH}
+                  returnKeyType="go"
+                  onSubmitEditing={handleSubmit}
+                />
+                <View style={styles.spacer} />
+                <ThemedButton title="Start watching" onPress={handleSubmit} loading={loading} disabled={loading} fullWidth />
+                <ThemedText variant="caption" style={styles.back} onPress={() => setStep('welcome')} accessibilityRole="button">
+                  Back
+                </ThemedText>
+              </Animated.View>
+            )}
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-  },
-
-  keyboardAvoid: {
-    flex: 1,
-  },
-
-  scrollContent: {
-    flexGrow: 1,
-  },
-
-  content: {
-    flex: 1,
-    paddingHorizontal: DESIGN_CONSTANTS.CONTAINER_PADDING,
-    justifyContent: 'center',
-  },
-
-  hero: {
-    alignItems: 'center',
-    marginBottom: DESIGN_CONSTANTS.CARD_PADDING,
-  },
-
-  logo: {
-    width: '80%',
-    height: '40%',
-    marginBottom: DESIGN_CONSTANTS.SPACING.medium,
-  },
-
-  title: {
-    textAlign: 'center',
-    marginBottom: DESIGN_CONSTANTS.SPACING.small,
-  },
-
-  subtitle: {
-    textAlign: 'center',
-  },
-
-  formCard: {
-    // padding: DESIGN_CONSTANTS.SPACING.medium,
-    borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.large,
-    marginBottom: DESIGN_CONSTANTS.SPACING.large,
-  },
-
-  inputTitle: {
-    marginBottom: DESIGN_CONSTANTS.SPACING.small,
-  },
-
-  buttonContainer: {
-    marginBottom: DESIGN_CONSTANTS.SPACING.medium,
-  },
-
-  footer: {
-    textAlign: 'center',
-    opacity: 0.7,
-  },
-});
