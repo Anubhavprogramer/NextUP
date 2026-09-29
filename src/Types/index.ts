@@ -85,7 +85,8 @@ export interface SearchBarProps {
 // Navigation types
 export type RootStackParamList = {
   Main: undefined;
-  Search: undefined;
+  Search: { initialQuery?: string } | undefined;
+  ReelImport: { sharedText: string };
   Collection: { status: CollectionStatus };
   MediaDetail: { mediaItem: MediaItem };
   Statistics: undefined;

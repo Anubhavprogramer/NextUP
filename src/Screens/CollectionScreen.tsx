@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -13,8 +13,11 @@ import { SearchHeader } from '../Components/Regular/SearchHeader';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
+import { useDialog } from '../Store/DialogContext';
 import { RootStackParamList, CollectionItem, CollectionStatus, MediaItem } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
+import { getCollectionStatusDisplayName } from '../Utils/helpers';
+import { collectionStatusActions } from '../Utils/collectionActions';
 
 type CollectionScreenRouteProp = RouteProp<RootStackParamList, 'Collection'>;
 type CollectionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Collection'>;
@@ -25,6 +28,7 @@ export const CollectionScreen: React.FC = () => {
   const navigation = useNavigation<CollectionScreenNavigationProp>();
   const { getCollectionByStatus, updateItemStatus, removeFromCollection } = useApp();
   const { showSuccess, showError } = useToast();
+  const { showActionSheet } = useDialog();
   
   const { status } = route.params;
   const [refreshing, setRefreshing] = useState(false);
@@ -65,24 +69,22 @@ export const CollectionScreen: React.FC = () => {
   }, [navigation]);
 
   const showStatusChangeOptions = (item: CollectionItem) => {
-    const currentStatus = item.status;
-    const statusOptions = [
-      { status: 'will_watch' as CollectionStatus, label: 'Want to Watch' },
-      { status: 'watching' as CollectionStatus, label: 'Currently Watching' },
-      { status: 'watched' as CollectionStatus, label: 'Watched' },
-    ].filter(option => option.status !== currentStatus);
-
-    Alert.alert(
-      'Change Status',
-      `Move "${item.mediaItem.title}" to:`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        ...statusOptions.map(option => ({
-          text: option.label,
-          onPress: () => handleStatusChange(item, option.status),
-        })),
-      ]
-    );
+    showActionSheet({
+      media: item.mediaItem,
+      message: `In ${getCollectionStatusDisplayName(item.status)}`,
+      actions: [
+        ...collectionStatusActions(theme, status => handleStatusChange(item, status), {
+          exclude: item.status,
+          prefix: 'Move to ',
+        }),
+        {
+          label: 'Remove from collection',
+          icon: 'trash-outline',
+          destructive: true,
+          onPress: () => handleRemoveItem(item),
+        },
+      ],
+    });
   };
 
   const handleStatusChange = async (item: CollectionItem, newStatus: CollectionStatus) => {
