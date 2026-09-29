@@ -1,8 +1,8 @@
 import { TMDBGenresResponse, TMDBSearchResponse, MediaItem, APIError } from '../Types';
+import { logger } from '../Utils/debugger';
 
 const API_KEY = 'bf5766befcb7d7ef1941f2b96f16ab2d';
 const BASE_URL = 'https://api.themoviedb.org/3';
-const ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiZjU3NjZiZWZjYjdkN2VmMTk0MWYyYjk2ZjE2YWIyZCIsIm5iZiI6MTc2NTk1NDgzMy44MzAwMDAyLCJzdWIiOiI2OTQyNTUxMWI0MzhiMTdiMGI3YTJhODkiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.5jEmQIMXICbnZxDVFULPAwyclG188VjVjfM35MkhCdY';
 
 /**
  * Build URL with query parameters (React Native compatible)
@@ -26,22 +26,21 @@ export async function tmdbFetch<T>(endpoint: string, params: Record<string, stri
   const url = buildUrl(endpoint, params);
   
   try {
-    console.log('🔍 TMDB API Request:', url);
-    
+    // Log the endpoint only: the full URL contains api_key. logger is dev-only.
+    logger.debug('TMDB', 'Request', { endpoint });
+
     // Simplified fetch for React Native compatibility
     const res = await fetch(url);
-
-    console.log('📡 TMDB API Response Status:', res.status);
 
     if (!res.ok) {
       let errorText = 'Unknown error';
       try {
         errorText = await res.text();
       } catch (e) {
-        console.warn('Could not read error response text');
+        logger.warn('TMDB', 'Could not read error response text');
       }
       
-      console.error('❌ TMDB API Error Response:', errorText);
+      logger.error('TMDB', 'Request failed', { endpoint, status: res.status, errorText });
       throw new APIError(
         `TMDB request failed: ${res.status} ${res.statusText}`,
         'TMDB_REQUEST_FAILED',
@@ -50,10 +49,9 @@ export async function tmdbFetch<T>(endpoint: string, params: Record<string, stri
     }
 
     const data = await res.json();
-    console.log('✅ TMDB API Success:', data.total_results || data.results?.length || 'N/A', 'results');
     return data;
   } catch (error) {
-    console.error('🚨 TMDB API Error:', error);
+    logger.error('TMDB', 'Request error', { endpoint, error: String(error) });
     
     if (error instanceof APIError) {
       throw error;
@@ -169,7 +167,7 @@ export async function searchMulti(query: string, page: number = 1): Promise<TMDB
   // Transform results to our MediaItem format
   const transformedResults = response.results
     .map(transformTMDBItem)
-    .filter((item): item is MediaItem => item !== null);
+    .filter((item: MediaItem | null): item is MediaItem => item !== null);
   
   return {
     page: response.page,
@@ -200,7 +198,7 @@ export async function searchMovies(query: string, page: number = 1): Promise<TMD
   // Transform results to our MediaItem format
   const transformedResults = response.results
     .map((item: any) => transformTMDBItem({ ...item, media_type: 'movie' }))
-    .filter((item): item is MediaItem => item !== null);
+    .filter((item: MediaItem | null): item is MediaItem => item !== null);
   
   return {
     page: response.page,
@@ -231,7 +229,7 @@ export async function searchTV(query: string, page: number = 1): Promise<TMDBSea
   // Transform results to our MediaItem format
   const transformedResults = response.results
     .map((item: any) => transformTMDBItem({ ...item, media_type: 'tv' }))
-    .filter((item): item is MediaItem => item !== null);
+    .filter((item: MediaItem | null): item is MediaItem => item !== null);
   
   return {
     page: response.page,
@@ -253,7 +251,7 @@ export async function discoverPopularMovies(page: number = 1): Promise<TMDBSearc
   // Transform results to our MediaItem format
   const transformedResults = response.results
     .map((item: any) => transformTMDBItem({ ...item, media_type: 'movie' }))
-    .filter((item): item is MediaItem => item !== null);
+    .filter((item: MediaItem | null): item is MediaItem => item !== null);
   
   return {
     page: response.page,
@@ -275,7 +273,7 @@ export async function discoverPopularTV(page: number = 1): Promise<TMDBSearchRes
   // Transform results to our MediaItem format
   const transformedResults = response.results
     .map((item: any) => transformTMDBItem({ ...item, media_type: 'tv' }))
-    .filter((item): item is MediaItem => item !== null);
+    .filter((item: MediaItem | null): item is MediaItem => item !== null);
   
   return {
     page: response.page,

@@ -90,7 +90,7 @@ export const MediaList: React.FC<MediaListProps> = ({
     recentTitle: {
       fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.subtitle,
       fontWeight: DESIGN_CONSTANTS.TYPOGRAPHY.weights.semibold,
-      color: theme.colors.textPrimary,
+      color: theme.colors.textSecondary,
     },
 
     clearAll: {
@@ -113,7 +113,7 @@ export const MediaList: React.FC<MediaListProps> = ({
 
     recentText: {
       fontSize: DESIGN_CONSTANTS.TYPOGRAPHY.sizes.body,
-      color: theme.colors.textPrimary,
+      color: theme.colors.textSecondary,
       marginLeft: DESIGN_CONSTANTS.SPACING.small,
     },
   });

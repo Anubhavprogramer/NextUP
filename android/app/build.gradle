@@ -77,10 +77,10 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.anubhavx10tion.codes"
+    namespace "com.anubhavx10tion.nextup"
 
     defaultConfig {
-        applicationId "com.anubhavx10tion.codes"
+        applicationId "com.anubhavx10tion.nextup"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

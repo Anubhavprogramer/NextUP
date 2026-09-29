@@ -1,4 +1,4 @@
-package com.anubhavx10tion.codes
+package com.anubhavx10tion.nextup
 
 import android.content.Intent
 import android.net.Uri

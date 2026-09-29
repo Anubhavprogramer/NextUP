@@ -30,7 +30,7 @@ One deep link on both platforms means there's no custom native module and only o
 |---|---|
 | iOS share extension | `ios/NextUPShare/ShareViewController.swift`, `ios/NextUPShare/Info.plist` (accepts 1 web URL or text) |
 | iOS URL scheme + forwarding to Linking | `ios/NextUP/Info.plist` (`CFBundleURLTypes: nextup`), `ios/NextUP/AppDelegate.swift` (`RCTLinkingManager`) |
-| Android share → import link | `android/app/src/main/java/com/anubhavx10tion/codes/MainActivity.kt` (`toImportIntent`), `AndroidManifest.xml` (SEND + `nextup://import` filters) |
+| Android share → import link | `android/app/src/main/java/com.anubhavx10tion.nextup/MainActivity.kt` (`toImportIntent`), `AndroidManifest.xml` (SEND + `nextup://import` filters) |
 | Link helpers | `src/Utils/reelLinks.ts` (+ tests) |
 | Backend client | `src/API/reels.ts` (+ tests), `src/Config/env.ts` |
 | Hand-off | `src/Store/ShareIntentContext.tsx`, `src/Navigation/AppNavigator.tsx` |
@@ -64,7 +64,7 @@ One deep link on both platforms means there's no custom native module and only o
 ```sh
 adb shell am start -a android.intent.action.SEND -t text/plain \
   --es android.intent.extra.TEXT "https://www.instagram.com/reel/<id>/" \
-  com.anubhavx10tion.codes
+  com.anubhavx10tion.nextup
 ```
 
 **Status:** iOS confirmed working on an iPhone 16 (iOS 26.6.1) by the user on 2026-09-29. Android compiles but hasn't been run on a device yet. How accurate the matching is on real reels hasn't been measured (see PRD §6.1).

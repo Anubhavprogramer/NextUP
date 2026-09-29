@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -140,14 +141,8 @@ export const SettingsScreen: React.FC = () => {
       padding: DESIGN_CONSTANTS.SPACING.medium,
       gap: DESIGN_CONSTANTS.SPACING.small,
     },
-    tmdbBadge: {
-      alignSelf: 'flex-start',
-      backgroundColor: '#0d253f', // TMDB brand navy
-      borderRadius: DESIGN_CONSTANTS.BORDER_RADIUS.medium,
-      paddingHorizontal: DESIGN_CONSTANTS.SPACING.medium,
-      paddingVertical: DESIGN_CONSTANTS.SPACING.xsmall,
-    },
-    tmdbBadgeText: { color: '#01b4e4', fontWeight: '700', letterSpacing: 1 },
+    // Official TMDB logo (assets/tmdb-logo.png, rendered from TMDB's blue_short SVG)
+    tmdbLogo: { width: 160, height: 160 * (62 / 480) },
   });
 
   const renderRow = ({
@@ -286,11 +281,12 @@ export const SettingsScreen: React.FC = () => {
                   accessibilityRole="link"
                   accessibilityLabel="The Movie Database (TMDB)"
                 >
-                  <View style={styles.tmdbBadge}>
-                    <ThemedText variant="body" style={styles.tmdbBadgeText}>
-                      TMDB
-                    </ThemedText>
-                  </View>
+                  <Image
+                    source={require('../../assets/tmdb-logo.png')}
+                    style={styles.tmdbLogo}
+                    resizeMode="contain"
+                    accessibilityIgnoresInvertColors
+                  />
                   <ThemedText variant="caption" style={styles.muted}>
                     This product uses the TMDB API but is not endorsed or certified by TMDB. Movie and TV
                     information and images are provided by The Movie Database.
