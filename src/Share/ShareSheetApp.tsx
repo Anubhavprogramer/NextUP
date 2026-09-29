@@ -6,6 +6,7 @@ import {
   Easing,
   Image,
   Linking,
+  NativeModules,
   Pressable,
   ScrollView,
   StatusBar,
@@ -31,6 +32,16 @@ const STATUS_OPTIONS: { status: CollectionStatus; label: string; icon: string }[
   { status: 'watching', label: 'Watching', icon: 'play-circle' },
   { status: 'watched', label: 'Watched', icon: 'checkmark-circle' },
 ];
+
+/**
+ * Finish Android's ShareActivity. BackHandler.exitApp() would act on React's
+ * current activity, which is MainActivity once the sheet has opened the app.
+ */
+const finishShareActivity = () => {
+  const native = NativeModules.NextUPShareSheet;
+  if (native?.close) native.close();
+  else BackHandler.exitApp();
+};
 
 /** How long the "Added ✓" confirmation stays before the sheet closes. */
 export const CLOSE_AFTER_SAVE_MS = 1100;
@@ -74,16 +85,20 @@ const ShareSheet: React.FC<{ sharedText: string }> = ({ sharedText }) => {
     Animated.parallel([
       Animated.timing(translateY, { toValue: OFFSCREEN, duration: ANIMATION_MS, easing: Easing.in(Easing.cubic), useNativeDriver: true }),
       Animated.timing(backdrop, { toValue: 0, duration: ANIMATION_MS, useNativeDriver: true }),
-    ]).start(() => BackHandler.exitApp()); // finishes ShareActivity, back to the caller
+    ]).start(finishShareActivity); // back to the app the user shared from
   }, [translateY, backdrop]);
 
   // Hand the share to the full app (onboarding, or the Import screen's manual search).
-  const openInApp = useCallback(() => {
-    Linking.openURL(`${IMPORT_LINK_PREFIX}?url=${encodeURIComponent(sharedText)}`).catch(error =>
-      logger.error('ShareSheet', 'Failed to open app', error),
-    );
-    close();
-  }, [sharedText, close]);
+  // Finish right after launching it: an exit animation here would race the app opening.
+  const openInApp = useCallback(async () => {
+    closing.current = true;
+    try {
+      await Linking.openURL(`${IMPORT_LINK_PREFIX}?url=${encodeURIComponent(sharedText)}`);
+    } catch (error) {
+      logger.error('ShareSheet', 'Failed to open app', error);
+    }
+    finishShareActivity();
+  }, [sharedText]);
 
   const load = useCallback(async () => {
     setPhase({ kind: 'loading' });

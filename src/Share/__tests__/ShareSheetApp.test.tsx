@@ -1,5 +1,5 @@
 import React from 'react';
-import { BackHandler, Linking } from 'react-native';
+import { Linking, NativeModules } from 'react-native';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ShareSheetApp, CLOSE_AFTER_SAVE_MS } from '../ShareSheetApp';
@@ -29,13 +29,14 @@ const movie = (id: number, title: string): MediaItem => ({
 const candidate = (m: MediaItem) => ({ media: m, confidence: 0.9, matchedOn: 'phrase', query: m.title });
 
 describe('Android share sheet', () => {
-  let exitApp: jest.SpyInstance;
+  let closeSheet: jest.Mock;
   let openURL: jest.SpyInstance;
 
   beforeEach(async () => {
     await AsyncStorage.clear();
     (resolveReel as jest.Mock).mockReset();
-    exitApp = jest.spyOn(BackHandler, 'exitApp').mockImplementation(() => {});
+    closeSheet = jest.fn();
+    NativeModules.NextUPShareSheet = { close: closeSheet };
     openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
   });
   afterEach(() => {
@@ -64,10 +65,10 @@ describe('Android share sheet', () => {
 
     const saved = await dataManager.findItemByMediaId(11324);
     expect(saved?.status).toBe('watching');
-    expect(exitApp).not.toHaveBeenCalled();
+    expect(closeSheet).not.toHaveBeenCalled();
 
     act(() => jest.advanceTimersByTime(CLOSE_AFTER_SAVE_MS + 500));
-    expect(exitApp).toHaveBeenCalled();
+    expect(closeSheet).toHaveBeenCalledTimes(1);
   });
 
   it('marks titles that are already saved and does not add them again', async () => {
@@ -90,7 +91,10 @@ describe('Android share sheet', () => {
     expect(resolveReel).not.toHaveBeenCalled();
 
     fireEvent.press(screen.getByText('Open NextUP'));
+    await waitFor(() => expect(closeSheet).toHaveBeenCalledTimes(1));
+    // The app is opened first, then the sheet closes (no exit animation to race it).
     expect(openURL).toHaveBeenCalledWith(`nextup://import?url=${encodeURIComponent(REEL)}`);
+    expect(openURL.mock.invocationCallOrder[0]).toBeLessThan(closeSheet.mock.invocationCallOrder[0]);
   });
 
   it('shows the reason and a way out when nothing is found', async () => {

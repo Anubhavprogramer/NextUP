@@ -2,6 +2,7 @@ package com.anubhavx10tion.nextup
 
 import android.content.Intent
 import android.os.Bundle
+import java.lang.ref.WeakReference
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -26,7 +27,13 @@ class ShareActivity : ReactActivity() {
   // No slide-in/out: the sheet animates itself over the caller.
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(null)
+    current = WeakReference(this)
     overridePendingTransition(0, 0)
+  }
+
+  override fun onDestroy() {
+    if (current?.get() === this) current = null
+    super.onDestroy()
   }
 
   override fun finish() {
@@ -36,4 +43,9 @@ class ShareActivity : ReactActivity() {
 
   private fun sharedText(intent: Intent?): String =
       if (intent?.action == Intent.ACTION_SEND) intent.getStringExtra(Intent.EXTRA_TEXT) ?: "" else ""
+
+  companion object {
+    /** The visible share sheet, closed by ShareSheetModule.close(). */
+    var current: WeakReference<ShareActivity>? = null
+  }
 }
