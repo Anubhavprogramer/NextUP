@@ -39,19 +39,16 @@ export interface AppState {
     watching: CollectionItem[];
     will_watch: CollectionItem[];
   };
-  theme: ThemePreference;
   isFirstLaunch: boolean;
 }
 
 // Utility types
 export type CollectionStatus = 'watched' | 'watching' | 'will_watch';
-export type ThemePreference = 'light' | 'dark' | 'system';
 export type MediaType = 'movie' | 'tv';
 
 // Component prop types
 export interface ThemedComponentProps {
   lightColor?: string;
-  darkColor?: string;
   style?: any;
 }
 
@@ -178,7 +175,6 @@ export interface TMDBTVDetails {
 export const STORAGE_KEYS = {
   USER_PROFILE: 'user_profile',
   COLLECTIONS: 'collections',
-  THEME_PREFERENCE: 'theme_preference',
   IS_FIRST_LAUNCH: 'is_first_launch',
   SEARCH_HISTORY_KEY:'search_history'
 } as const;

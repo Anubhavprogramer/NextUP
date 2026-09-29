@@ -1,8 +1,10 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
+    <!-- Light only: NextUP has a single theme, so system UI (dialogs, keyboard
+         chrome) and Android's "force dark" must never go dark. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:forceDarkAllowed">false</item>
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
     </style>
 
