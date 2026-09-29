@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,9 +19,11 @@ import { StatCard } from '../Components/Regular/StatCard';
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
+import { useDialog } from '../Store/DialogContext';
 import { RootStackParamList, CollectionItem, CollectionStatus } from '../Types';
 import { DESIGN_CONSTANTS } from '../Utils/constants';
-import { calculateCollectionStats } from '../Utils/helpers';
+import { calculateCollectionStats, getCollectionStatusDisplayName } from '../Utils/helpers';
+import { collectionStatusActions } from '../Utils/collectionActions';
 import { Images } from '../Utils/Imges';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
@@ -41,6 +42,7 @@ export const HomeScreen: React.FC = () => {
     removeFromCollection,
   } = useApp();
   const { showSuccess, showError } = useToast();
+  const { showActionSheet } = useDialog();
 
   const stats = appState?.collections
     ? calculateCollectionStats(appState.collections)
@@ -51,29 +53,22 @@ export const HomeScreen: React.FC = () => {
   };
 
   const handleItemLongPress = (item: CollectionItem) => {
-    const currentStatus = item.status;
-    const statusOptions = [
-      { status: 'will_watch' as CollectionStatus, label: 'Want to Watch' },
-      { status: 'watching' as CollectionStatus, label: 'Currently Watching' },
-      { status: 'watched' as CollectionStatus, label: 'Watched' },
-    ].filter(option => option.status !== currentStatus);
-
-    Alert.alert(
-      'Manage Item',
-      `"${item.mediaItem.title}" - What would you like to do?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        ...statusOptions.map(option => ({
-          text: `Move to ${option.label}`,
-          onPress: () => handleStatusChange(item, option.status),
-        })),
+    showActionSheet({
+      media: item.mediaItem,
+      message: `In ${getCollectionStatusDisplayName(item.status)}`,
+      actions: [
+        ...collectionStatusActions(theme, status => handleStatusChange(item, status), {
+          exclude: item.status,
+          prefix: 'Move to ',
+        }),
         {
-          text: 'Remove from Collection',
-          style: 'destructive',
+          label: 'Remove from collection',
+          icon: 'trash-outline',
+          destructive: true,
           onPress: () => handleRemoveItem(item),
         },
       ],
-    );
+    });
   };
 
   const handleStatusChange = async (
