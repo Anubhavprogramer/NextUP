@@ -91,7 +91,6 @@ export class DataManager implements CollectionOperations {
       const appState: AppState = {
         user,
         collections,
-        theme: 'system', // Theme is managed by ThemeContext
         isFirstLaunch,
       };
 

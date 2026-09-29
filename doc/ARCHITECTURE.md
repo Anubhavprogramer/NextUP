@@ -17,7 +17,7 @@ src/
 │   ├── LoadingScreen, ErrorScreen
 ├── Store/                        React Context state
 │   ├── AppContext.tsx            appState + collection actions (wraps DataManager)
-│   ├── ThemeContext.tsx          light / dark / system, saved to storage
+│   ├── ThemeContext.tsx          the single light theme (useTheme / useThemeColor)
 │   ├── ToastContext.tsx          showSuccess / showError / showInfo
 │   └── hooks.ts                  useDebounce
 ├── Manager/                      Business logic singletons (no React)
@@ -29,7 +29,7 @@ src/
 │   └── Regular/                  MediaCard, MediaList, CollectionSection, StatCard, StatusButton, Toast, …
 ├── Types/index.ts                All domain types, type guards, STORAGE_KEYS, VALIDATION_CONSTANTS
 └── Utils/
-    ├── constants.ts              DESIGN_CONSTANTS, LIGHT_THEME, DARK_THEME, TMDB_CONFIG, APP_CONFIG
+    ├── constants.ts              DESIGN_CONSTANTS, LIGHT_THEME, TMDB_CONFIG, APP_CONFIG
     ├── helpers.ts                id gen, formatting, image URLs, sorting, stats
     ├── debugger.ts               `logger` (in-memory log buffer, exportLogs)
     └── Imges.ts                  static image requires
@@ -78,7 +78,7 @@ A `mediaItem.id` appears at most once across all three lists. `DataManager.addIt
 
 ## Theming
 
-`ThemeContext` picks `LIGHT_THEME` or `DARK_THEME` (warm peach/coffee palette) based on the saved preference or the system scheme. Components read `theme.colors.*` and `DESIGN_CONSTANTS.*`, and don't hardcode values. `toggleTheme` and `setThemePreference` exist, but no UI calls them yet. That's planned for the Settings screen.
+NextUP has **one theme**: `LIGHT_THEME` (warm peach). Dark mode was removed on purpose. `ThemeContext` always provides the light palette, and the native projects pin light mode so system UI can't go dark either: `UIUserInterfaceStyle = Light` in both iOS `Info.plist` files (app and share extension), and a `Theme.AppCompat.Light` parent with `forceDarkAllowed=false` on Android. Components read `theme.colors.*` and `DESIGN_CONSTANTS.*` through `useTheme()`, and don't hardcode values.
 
 ## Error handling
 

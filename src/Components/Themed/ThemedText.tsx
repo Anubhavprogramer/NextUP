@@ -12,18 +12,16 @@ export type TextVariant =
 
 export interface ThemedTextProps extends TextProps {
   lightColor?: string;
-  darkColor?: string;
   variant?: TextVariant;
 }
 
 export const ThemedText: React.FC<ThemedTextProps> = ({
   style,
   lightColor,
-  darkColor,
   variant = 'body',
   ...otherProps
 }) => {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const color = useThemeColor({ light: lightColor }, 'text');
 
   const variantStyle = styles[variant];
 

@@ -6,7 +6,7 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ThemeProvider, useTheme } from './src/Store/ThemeContext';
+import { ThemeProvider } from './src/Store/ThemeContext';
 import { AppProvider } from './src/Store/AppContext';
 import { ToastProvider } from './src/Store/ToastContext';
 import { ShareIntentProvider } from './src/Store/ShareIntentContext';
@@ -37,19 +37,9 @@ function App() {
 }
 
 function AppContent() {
-  const { isDark } = useTheme();
-
-  useEffect(() => {
-    try {
-      logger.debug('AppContent', 'Theme changed', { isDark });
-      StatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content', true);
-    } catch (error) {
-      logger.error('AppContent', 'Failed to update status bar', error);
-    }
-  }, [isDark]);
-
   return (
     <>
+      <StatusBar barStyle="dark-content" />
       <AppNavigator />
     </>
   );

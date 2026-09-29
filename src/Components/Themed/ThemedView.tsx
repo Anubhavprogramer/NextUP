@@ -4,19 +4,14 @@ import { useThemeColor } from '../../Store/ThemeContext';
 
 export interface ThemedViewProps extends ViewProps {
   lightColor?: string;
-  darkColor?: string;
 }
 
 export const ThemedView: React.FC<ThemedViewProps> = ({
   style,
   lightColor,
-  darkColor,
   ...otherProps
 }) => {
-  const backgroundColor = useThemeColor(
-    { light: lightColor, dark: darkColor },
-    'background'
-  );
+  const backgroundColor = useThemeColor({ light: lightColor }, 'background');
 
   return <View style={[{ backgroundColor }, style]} {...otherProps} />;
 };
