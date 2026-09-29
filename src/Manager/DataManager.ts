@@ -189,6 +189,7 @@ export class DataManager implements CollectionOperations {
         payload: { profile: profile! },
       });
     } catch (error) {
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to save user profile: ${error}`,
         'SAVE_PROFILE_ERROR'
@@ -338,6 +339,8 @@ export class DataManager implements CollectionOperations {
 
       return newItem;
     } catch (error) {
+      // Keep specific codes (e.g. DUPLICATE_ITEM, ITEM_NOT_FOUND) intact for callers
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to add item to collection: ${error}`,
         'ADD_ITEM_ERROR'
@@ -374,6 +377,7 @@ export class DataManager implements CollectionOperations {
         payload: { itemId },
       });
     } catch (error) {
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to remove item: ${error}`,
         'REMOVE_ITEM_ERROR'
@@ -415,6 +419,7 @@ export class DataManager implements CollectionOperations {
 
       return updatedItem;
     } catch (error) {
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to update item status: ${error}`,
         'UPDATE_STATUS_ERROR'
@@ -571,6 +576,7 @@ export class DataManager implements CollectionOperations {
 
       return updatedItem;
     } catch (error) {
+      if (error instanceof StorageError) throw error;
       throw new StorageError(
         `Failed to update item field: ${error}`,
         'UPDATE_FIELD_ERROR'

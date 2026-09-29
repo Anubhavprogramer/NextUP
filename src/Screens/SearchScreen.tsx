@@ -1,17 +1,20 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { RouteProp, useRoute } from '@react-navigation/native';
 
 import { useTheme } from '../Store/ThemeContext';
 import { useApp } from '../Store/AppContext';
 import { useToast } from '../Store/ToastContext';
+import { useDialog } from '../Store/DialogContext';
+import { collectionStatusActions } from '../Utils/collectionActions';
 
 import { dataManager } from '../Manager/DataManager';
 
 import { MediaList } from '../Components/Regular/MediaList';
 import { SearchHeader } from '../Components/Regular/SearchHeader';
 
-import { MediaItem, APIError, SearchHistoryItem } from '../Types';
+import { MediaItem, APIError, SearchHistoryItem, StorageError, RootStackParamList } from '../Types';
 
 import { searchMulti } from '../API/tmdb';
 
@@ -22,12 +25,15 @@ export const SearchScreen: React.FC = () => {
   const { theme } = useTheme();
   const { addToCollection, findItemByMediaId } = useApp();
   const { showSuccess, showError, showInfo } = useToast();
+  const { showActionSheet } = useDialog();
 
   const [searchResults, setSearchResults] = useState<MediaItem[]>([]);
   const [recentSearches, setRecentSearches] = useState<SearchHistoryItem[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [currentQuery, setCurrentQuery] = useState('');
+  // Pre-filled when coming from a reel import that found no match.
+  const initialQuery = useRoute<RouteProp<RootStackParamList, 'Search'>>().params?.initialQuery ?? '';
+  const [currentQuery, setCurrentQuery] = useState(initialQuery);
 
   const debouncedSearch = useDebounce(currentQuery, 600);
 
@@ -165,30 +171,13 @@ export const SearchScreen: React.FC = () => {
         return;
       }
 
-      Alert.alert(
-        'Add to Collection',
-        `Add "${mediaItem.title}" to which collection?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-
-          {
-            text: 'Want to Watch',
-            onPress: () => handleAddToCollection(mediaItem, 'will_watch'),
-          },
-
-          {
-            text: 'Currently Watching',
-            onPress: () => handleAddToCollection(mediaItem, 'watching'),
-          },
-
-          {
-            text: 'Watched',
-            onPress: () => handleAddToCollection(mediaItem, 'watched'),
-          },
-        ],
-      );
+      showActionSheet({
+        media: mediaItem,
+        message: 'Add to your collection',
+        actions: collectionStatusActions(theme, status => handleAddToCollection(mediaItem, status)),
+      });
     },
-    [findItemByMediaId, showInfo],
+    [findItemByMediaId, showInfo, showActionSheet, theme],
   );
 
   const handleAddToCollection = useCallback(
@@ -214,10 +203,14 @@ export const SearchScreen: React.FC = () => {
 
         console.error('Add to collection error:', error);
 
-        showError('Unable to add to collection');
+        if (error instanceof StorageError && error.code === 'DUPLICATE_ITEM') {
+          showInfo('Already in your collection');
+        } else {
+          showError('Unable to add to collection');
+        }
       }
     },
-    [addToCollection, showSuccess, showError],
+    [addToCollection, showSuccess, showError, showInfo],
   );
 
   // ===============================
@@ -278,6 +271,7 @@ export const SearchScreen: React.FC = () => {
       <SearchHeader
         onSearch={handleSearch}
         placeholder="Search movies and TV shows..."
+        initialValue={initialQuery}
       />
 
       <View style={styles.content}>

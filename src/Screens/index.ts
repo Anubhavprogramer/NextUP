@@ -6,4 +6,4 @@ export * from './HomeScreen';
 export * from './CollectionScreen';
 export * from './MediaDetailScreen';
 export * from './LoadingScreen';
-export * from './ErrorScreen';
+export * from './ErrorScreen';export * from './ReelImportScreen';

@@ -45,11 +45,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         try {
           logger.debug('AppProvider', 'Data change event received', { eventType: event.type });
           
+          // ITEM_* events are not handled here: the collection methods below
+          // already refresh after their DataManager call, so reacting here too
+          // would reload storage twice per change.
           if (event.type === 'PROFILE_UPDATED') {
             logger.debug('AppProvider', 'Updating profile in state');
             setAppState(prev => prev ? { ...prev, user: event.payload.profile } : null);
-          } else if (event.type === 'ITEM_ADDED' || event.type === 'ITEM_REMOVED' || event.type === 'ITEM_UPDATED') {
-            logger.debug('AppProvider', 'Refreshing app state due to collection change');
+          } else if (event.type === 'COLLECTION_CLEARED') {
+            logger.debug('AppProvider', 'Refreshing app state due to collection clear');
             refreshAppState();
           }
         } catch (error) {
@@ -80,10 +83,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
+  // Background refresh: must not toggle `loading`, because AppNavigator swaps
+  // the whole NavigationContainer for LoadingScreen while loading is true,
+  // which would reset the navigation stack after every collection change.
   const refreshAppState = async () => {
     try {
       logger.debug('AppProvider', 'Refreshing app state');
-      await loadAppState();
+      const state = await dataManager.loadAppState();
+      setAppState(state);
+      setError(null);
     } catch (error) {
       logger.error('AppProvider', 'Error refreshing app state', error);
     }
