@@ -51,8 +51,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           if (event.type === 'PROFILE_UPDATED') {
             logger.debug('AppProvider', 'Updating profile in state');
             setAppState(prev => prev ? { ...prev, user: event.payload.profile } : null);
-          } else if (event.type === 'COLLECTION_CLEARED') {
-            logger.debug('AppProvider', 'Refreshing app state due to collection clear');
+          } else if (event.type === 'COLLECTION_CLEARED' || event.type === 'DATA_IMPORTED') {
+            logger.debug('AppProvider', 'Refreshing app state after bulk change', { eventType: event.type });
             refreshAppState();
           }
         } catch (error) {

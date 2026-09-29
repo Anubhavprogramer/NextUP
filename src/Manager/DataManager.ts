@@ -526,6 +526,38 @@ export class DataManager implements CollectionOperations {
     }
   }
 
+  /**
+   * Merge already-validated items (e.g. from a backup) into the collections.
+   * Items whose media is already saved are skipped, so existing statuses,
+   * ratings and notes are never overwritten.
+   */
+  async mergeCollectionItems(items: CollectionItem[]): Promise<{ imported: number; skipped: number }> {
+    try {
+      const collections = await this.getAllCollections();
+      const savedMediaIds = new Set(
+        Object.values(collections).flat().map(item => item.mediaItem.id)
+      );
+
+      let imported = 0;
+      for (const item of items) {
+        if (savedMediaIds.has(item.mediaItem.id)) continue;
+        collections[item.status].push(item);
+        savedMediaIds.add(item.mediaItem.id);
+        imported++;
+      }
+
+      if (imported > 0) {
+        await this.saveAllCollections(collections);
+        this.emitChange({ type: 'DATA_IMPORTED', payload: { imported } });
+      }
+
+      return { imported, skipped: items.length - imported };
+    } catch (error) {
+      if (error instanceof StorageError) throw error;
+      throw new StorageError(`Failed to import items: ${error}`, 'IMPORT_ERROR');
+    }
+  }
+
   // ========== Private Helper Methods ==========
 
   /**

@@ -353,6 +353,7 @@ export type DataChangeEvent =
   | { type: 'PROFILE_UPDATED'; payload: { profile: UserProfile } }
   | { type: 'COLLECTION_CLEARED'; payload: { status: CollectionStatus } }
   | { type: 'SEARCH_HISTORY_UPDATED'; payload: { history: SearchHistoryItem[] } }
+  | { type: 'DATA_IMPORTED'; payload: { imported: number } }
 
 export interface DataChangeListener {
   (event: DataChangeEvent): void;

@@ -30,6 +30,22 @@ jest.mock('@react-navigation/native', () => {
 // Mock vector icons
 jest.mock('react-native-vector-icons/Ionicons', () => 'Icon');
 
+// Native file modules used by Settings → backup (src/Utils/backupFiles.ts)
+jest.mock('@react-native-documents/picker', () => ({
+  pick: jest.fn(),
+  keepLocalCopy: jest.fn(),
+  saveDocuments: jest.fn(),
+  isErrorWithCode: (error: any) => !!error && typeof error.code === 'string',
+  errorCodes: { OPERATION_CANCELED: 'OPERATION_CANCELED' },
+  types: { json: 'public.json', allFiles: '*/*' },
+}));
+jest.mock('@dr.pogodin/react-native-fs', () => ({
+  CachesDirectoryPath: '/cache',
+  writeFile: jest.fn(() => Promise.resolve()),
+  readFile: jest.fn(),
+  unlink: jest.fn(() => Promise.resolve()),
+}));
+
 // Mock our custom UUID generator for consistent test results
 jest.mock('../Utils/helpers', () => {
   const actual = jest.requireActual('../Utils/helpers');

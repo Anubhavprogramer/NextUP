@@ -14,6 +14,7 @@ Product and cross-repo docs: [`../../doc/`](../../doc/README.md) (PRD, roadmap, 
 - ✅ Onboarding, Home, Search, Detail, Collection screens
 - ✅ Reel import via the share sheet: iOS share extension (tested on iPhone) + Android share intent (compiles; not yet tested on a device)
 - ✅ Themed bottom-sheet popups (`useDialog`) · single light theme
-- ✅ 17 Jest tests
-- ⏳ Settings screen, export/import backup, rating/notes UI
+- ✅ Settings screen (gear icon on Home): edit name, export/import backup, version, TMDB attribution
+- ✅ 28 Jest tests
+- ⏳ Rating/notes UI, official TMDB logo
 - ⏳ Play Store release (final app ID, privacy policy, store assets)

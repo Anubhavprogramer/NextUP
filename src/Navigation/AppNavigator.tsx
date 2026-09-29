@@ -7,6 +7,7 @@ import { SearchScreen } from '../Screens/SearchScreen';
 import { CollectionScreen } from '../Screens/CollectionScreen';
 import { MediaDetailScreen } from '../Screens/MediaDetailScreen';
 import { ReelImportScreen } from '../Screens/ReelImportScreen';
+import { SettingsScreen } from '../Screens/SettingsScreen';
 import { LoadingScreen } from '../Screens/LoadingScreen';
 import { ErrorScreen } from '../Screens/ErrorScreen';
 import { useApp } from '../Store/AppContext';
@@ -84,6 +85,7 @@ export const AppNavigator: React.FC = () => {
           }}
         />
         <Stack.Screen name="ReelImport" component={ReelImportScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen 
           name="MediaDetail" 
           component={MediaDetailScreen}
