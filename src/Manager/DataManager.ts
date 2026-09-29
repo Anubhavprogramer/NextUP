@@ -569,18 +569,18 @@ export class DataManager implements CollectionOperations {
   ): Promise<CollectionItem> {
     try {
       const collections = await this.getAllCollections();
-      let item: CollectionItem | null = null;
-      let collectionStatus: CollectionStatus | null = null;
+      let item: CollectionItem | undefined;
+      let collectionStatus: CollectionStatus | undefined;
 
       // Find item in collections
-      Object.keys(collections).forEach(status => {
-        const collection = collections[status as CollectionStatus];
-        const foundItem = collection.find(i => i.id === itemId);
+      for (const status of Object.keys(collections) as CollectionStatus[]) {
+        const foundItem = collections[status].find(i => i.id === itemId);
         if (foundItem) {
           item = foundItem;
-          collectionStatus = status as CollectionStatus;
+          collectionStatus = status;
+          break;
         }
-      });
+      }
 
       if (!item || !collectionStatus) {
         throw new StorageError('Item not found', 'ITEM_NOT_FOUND');

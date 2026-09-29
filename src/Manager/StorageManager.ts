@@ -117,7 +117,7 @@ export class LocalStorageManager implements StorageManager {
   async getAllKeys(): Promise<string[]> {
     return this.executeWithRetry(async () => {
       try {
-        return await AsyncStorage.getAllKeys();
+        return [...(await AsyncStorage.getAllKeys())];
       } catch (error) {
         throw new StorageError(
           `Failed to get storage keys: ${error}`,

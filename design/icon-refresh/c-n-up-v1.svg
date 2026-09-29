@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- C · N-Up: an N whose right stem keeps rising into an arrow — "next" becomes "up". Round strokes (exploration). -->
+  <g fill="none" stroke="#000" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" transform="translate(-12 6)">
+    <path d="M78 206 V72 L172 196 V44"/>
+    <path d="M136 80 L172 44 L208 80"/>
+  </g>
+</svg>

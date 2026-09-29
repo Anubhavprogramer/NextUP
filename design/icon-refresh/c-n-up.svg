@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <title>NextUP · N-Up</title>
+  <!-- Outlined from v1 (stroke 36): stems as rounded rects, diagonal and arrow arms as quads with round ends. -->
+  <g fill="#000" transform="translate(-12 6)">
+    <rect x="60" y="54" width="36" height="170" rx="18"/>
+    <rect x="154" y="26" width="36" height="188" rx="18"/>
+    <polygon points="92.35,61.13 186.35,185.13 157.65,206.87 63.65,82.87"/>
+    <polygon points="148.73,92.73 184.73,56.73 159.27,31.27 123.27,67.27"/>
+    <polygon points="184.73,31.27 220.73,67.27 195.27,92.73 159.27,56.73"/>
+    <circle cx="136" cy="80" r="18"/>
+    <circle cx="208" cy="80" r="18"/>
+  </g>
+</svg>

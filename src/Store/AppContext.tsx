@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { AppState as RNAppState } from 'react-native';
 import { dataManager } from '../Manager/DataManager';
 import { UserProfile, AppState, MediaItem, CollectionStatus, CollectionItem } from '../Types';
 import { logger } from '../Utils/debugger';
@@ -60,7 +61,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         }
       });
 
-      return unsubscribe;
+      // Titles can be saved while the app is in the background (Android share
+      // sheet runs in the same process), so reload when the app comes back.
+      const appStateSub = RNAppState.addEventListener('change', nextState => {
+        if (nextState === 'active') refreshAppState();
+      });
+
+      return () => {
+        unsubscribe();
+        appStateSub.remove();
+      };
     } catch (error) {
       logger.error('AppProvider', 'Error in app provider useEffect', error);
       return undefined;

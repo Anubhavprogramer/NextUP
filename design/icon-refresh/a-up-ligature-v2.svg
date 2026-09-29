@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- A · UP ligature v2: stroke 32; larger P bowl (counter 34×56) so it stays open small. -->
+  <g fill="none" stroke="#000" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" transform="translate(-13 4)">
+    <path d="M66 60 V150 A42 42 0 0 0 150 150 V60"/>
+    <path d="M150 60 H172 A44 44 0 0 1 172 148 H150"/>
+  </g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- A · UP ligature: the U's right arm is the P's stem; one continuous stroke. Built as 34-unit round strokes (exploration). -->
+  <g fill="none" stroke="#000" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" transform="translate(-14 0)">
+    <path d="M70 62 V148 A44 44 0 0 0 158 148 V62"/>
+    <path d="M158 62 H180 A38 38 0 0 1 180 138 H158"/>
+  </g>
+</svg>
